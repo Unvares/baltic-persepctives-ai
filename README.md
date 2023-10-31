@@ -1,4 +1,4 @@
-# K8s Base Template
+# Hanseatic Hackathon 2023 Base Camp
 
 Base Template for Kubernetes-based Projects
 
