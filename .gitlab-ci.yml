@@ -63,8 +63,8 @@ indexer:
   stage: deploy
   script:
   - cd deploy
-  - mo indexer-job.yaml | kubectl delete -f - || true
-  - mo indexer-job.yaml | kubectl apply -f -
+  - mo index-job.yaml | kubectl delete -f - || true
+  - mo index-job.yaml | kubectl apply -f -
 
 ingress:
     stage: expose
