@@ -20,6 +20,13 @@ spec:
         #   value: "http://em-german-70b.llama2"
         ports:
         - containerPort: 8501
+        resources:
+          limits:
+            memory: 1000M
+            cpu: 250m
+          requests:
+            memory: 250M
+            cpu: 100m
         volumeMounts:
         - name: data
           mountPath: /data
