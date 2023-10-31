@@ -70,4 +70,4 @@ ingress:
     stage: expose
     script:
     - cd deploy
-    - kubectl apply -f project-ing.yaml
+    - mo project-ing.yaml | kubectl apply -f -
