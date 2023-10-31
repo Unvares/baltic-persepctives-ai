@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: demo
+  annotations:
+    acme.cert-manager.io/http01-edit-in-place: 'true'
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.org/proxy-connect-timeout: 3600s
+    nginx.org/proxy-read-timeout: 3600s
+    nginx.org/proxy-send-timeout: 3600s
+spec:
+  rules:
+  - host: demo-{{CI_PROJECT_ID}}.llm.mylab.th-luebeck.dev
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kira
+            port:
+              number: 80
+  tls:
+    - hosts:
+        - demo-{{CI_PROJECT_ID}}.llm.mylab.th-luebeck.dev
+      secretName: demo-{{CI_PROJECT_ID}}-ingress-cert

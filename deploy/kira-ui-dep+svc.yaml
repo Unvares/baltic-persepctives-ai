@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kira
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kira
+  template:
+    metadata:
+      labels:
+        app: kira
+    spec:
+      containers:
+      - name: kira
+        image: {{CI_REGISTRY_IMAGE}}/kira:latest
+        # env:
+        # - name: LLM_TGI_URL
+        #   value: "http://em-german-70b.llama2"
+        ports:
+        - containerPort: 8501
+        volumeMounts:
+        - name: demo-data
+          mountPath: /data
+      imagePullSecrets:
+      - name: gitlab-registry-{{CI_PROJECT_ID}}
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: demo-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kira
+  labels:
+    app: kira
+spec:
+  type: ClusterIP
+  selector:
+    app: kira
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8501
