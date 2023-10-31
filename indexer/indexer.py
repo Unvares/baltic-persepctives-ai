@@ -1,6 +1,11 @@
+# Achtung: Dies ist nur ein sehr einfaches und nicht sonderlich effizientes Beispiel für die Indizierung
+# einer Datenquelle (hier: Liste von deutschen Witzen).
+# Es ist bspw. ratsam nur neue Dokumente zu indizieren und nicht jedesmal den Index komplett neu aufzubauen.
+#
 import requests
 import chromadb
 import os
+import shutil
 from langchain.vectorstores import Chroma
 from langchain.embeddings import LocalAIEmbeddings
 from langchain.schema.document import Document
@@ -8,6 +13,12 @@ from langchain.schema.document import Document
 EMBEDDINGS_ENDPOINT = os.environ.get("EMBEDDINGS_ENDPOINT", "https://embeddings.llm.mylab.th-luebeck.dev")
 DB_PATH = os.environ.get("DB_PATH", "/data/chromadb")
 COLLECTION_NAME = os.environ.get("COLLECTION_NAME", "witze")
+
+try:
+    print("Lösche bereits erstellten Index.")
+    shutil.rmtree(DB_PATH)
+except Exception as ex:
+    print(f"Kein Index gefunden. {ex}")
 
 persistent_client = chromadb.PersistentClient(path=DB_PATH)
 collection = persistent_client.get_or_create_collection(COLLECTION_NAME)
