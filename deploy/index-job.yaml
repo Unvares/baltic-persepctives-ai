@@ -6,6 +6,8 @@ spec:
   template:
     spec:
       restartPolicy: "OnFailure"
+      backOffLimit: 3
+      ttlSecondsAfterFinished: 3600
       containers:
       - name: indexer
         image: {{CI_REGISTRY_IMAGE}}/indexer:latest
