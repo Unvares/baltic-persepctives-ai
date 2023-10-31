@@ -5,6 +5,7 @@ metadata:
 spec:
   template:
     spec:
+      restartPolicy: "OnFailure"
       containers:
       - name: indexer
         image: {{CI_REGISTRY_IMAGE}}/indexer:latest
