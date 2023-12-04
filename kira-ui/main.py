@@ -3,7 +3,7 @@ from text_generation import Client
 from langchain.prompts import PromptTemplate
 import os
 
-llama2 = Client(os.environ.get("LLM_TGI_URL", "https://em-german-13b.llm.mylab.th-luebeck.dev"))
+llama2 = Client(os.environ.get("LLM_TGI_URL", "https://em-german-70b.llm.mylab.th-luebeck.dev"))
 
 vicuna       = PromptTemplate.from_template("{context}\n\nUSER:\n{prompt}\n\nASSISTANT:\n")
 vicuna_chat  = PromptTemplate.from_template("{role}\n{text}\n")
@@ -76,7 +76,7 @@ with st.sidebar:
             <br>
             Powered by
             <br>
-            <strong><a href="https://huggingface.co/TheBloke/em_german_13b_v01-AWQ">EM German 13B (Llama2)</a></strong>
+            <strong><a href="https://huggingface.co/TheBloke/em_german_70b_v01-AWQ">EM German 70B (Llama2)</a></strong>
             <br>
             (on-premise, no cloud, no data sniffing)
             <br>
