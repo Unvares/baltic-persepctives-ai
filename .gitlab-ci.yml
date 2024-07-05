@@ -37,6 +37,21 @@ chatbot-img:
   - docker build -t $CI_REGISTRY_IMAGE/chatbot:latest .
   - docker push $CI_REGISTRY_IMAGE/chatbot:latest
 
+chatbot-rag-img:
+  stage: build
+  image: docker:24
+  services: ["docker:24-dind"]
+  only:
+    changes:
+    - chatbot-rag/*
+    - chatbot-rag/*/**
+    - .gitlab-ci.yml
+  script:
+  - cd chatbot-rag
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  - docker build -t $CI_REGISTRY_IMAGE/chatbot-rag:latest .
+  - docker push $CI_REGISTRY_IMAGE/chatbot-rag:latest
+
 chatbot:
   stage: deploy
   script:
