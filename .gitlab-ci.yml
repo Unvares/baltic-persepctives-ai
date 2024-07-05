@@ -31,6 +31,8 @@ chatbot-img:
     - chatbot/*
     - chatbot/*/**
     - .gitlab-ci.yml
+  when:
+    manual
   script:
   - cd chatbot
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -46,6 +48,8 @@ chatbot-rag-img:
     - chatbot-rag/*
     - chatbot-rag/*/**
     - .gitlab-ci.yml
+  when:
+    manual
   script:
   - cd chatbot-rag
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
