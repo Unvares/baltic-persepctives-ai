@@ -22,49 +22,27 @@ volumes:
   - cd deploy
   - kubectl apply -f demo-pvc.yaml
 
-kira-ui-img:
+chatbot-img:
   stage: build
   image: docker:24
   services: ["docker:24-dind"]
   only:
     changes:
-    - kira-ui/*
-    - kira-ui/*/**
+    - chatbot/*
+    - chatbot/*/**
     - .gitlab-ci.yml
   script:
-  - cd kira-ui
+  - cd chatbot
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  - docker build -t $CI_REGISTRY_IMAGE/kira:latest .
-  - docker push $CI_REGISTRY_IMAGE/kira:latest
+  - docker build -t $CI_REGISTRY_IMAGE/chatbot:latest .
+  - docker push $CI_REGISTRY_IMAGE/chatbot:latest
 
-indexer-img:
-  stage: build
-  image: docker:24
-  services: ["docker:24-dind"]
-  only:
-    changes:
-    - indexer/*
-    - indexer/*/**
-    - .gitlab-ci.yml
-  script:
-  - cd indexer
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  - docker build -t $CI_REGISTRY_IMAGE/indexer:latest .
-  - docker push $CI_REGISTRY_IMAGE/indexer:latest
-
-kira-ui:
+chatbot:
   stage: deploy
   script:
   - cd deploy
-  - mo kira-ui-dep+svc.yaml | kubectl delete -f - || true
-  - mo kira-ui-dep+svc.yaml | kubectl apply -f -
-
-indexer:
-  stage: deploy
-  script:
-  - cd deploy
-  - mo index-job.yaml | kubectl delete -f - || true
-  - mo index-job.yaml | kubectl apply -f -
+  - mo chatbot-dep+svc.yaml | kubectl delete -f - || true
+  - mo chatbot-dep+svc.yaml | kubectl apply -f -
 
 ingress:
     stage: expose
