@@ -1,4 +1,0 @@
-tiktoken
-chromadb
-langchain
-openai

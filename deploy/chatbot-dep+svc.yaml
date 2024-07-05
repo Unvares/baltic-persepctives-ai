@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kira
+  name: chatbot
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kira
+      app: chatbot
   template:
     metadata:
       labels:
-        app: kira
+        app: chatbot
     spec:
       containers:
-      - name: kira
-        image: {{CI_REGISTRY_IMAGE}}/kira:latest
-        # env:
-        # - name: LLM_TGI_URL
-        #   value: "http://em-german-70b.llama2"
+      - name: chatbot
+        image: {{CI_REGISTRY_IMAGE}}/chatbot:latest
+        env:
+        - name: LLM_ENDPOINT
+          value: "https://chat-large.llm.mylab.th-luebeck.dev/v1"
         ports:
         - containerPort: 8501
         resources:
@@ -40,13 +40,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: kira
+  name: chatbot
   labels:
-    app: kira
+    app: chatbot
 spec:
   type: ClusterIP
   selector:
-    app: kira
+    app: chatbot
   ports:
   - name: http
     port: 80
