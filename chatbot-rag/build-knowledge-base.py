@@ -2,12 +2,15 @@ from glob import glob
 import requests
 import zipfile
 import io
+import os
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 
-embeddings = OpenAIEmbeddings(api_key="sk-proj-M0N3AniQmJwCGttxwUn5T3BlbkFJ6VhsTuPbdauF8WeMrxRv")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "-")
+
+embeddings = OpenAIEmbeddings(api_key=OPENAI_API_KEY)
 
 print("Downloading prompt engineering guide")
 url = 'https://github.com/dair-ai/Prompt-Engineering-Guide/archive/refs/heads/main.zip'
