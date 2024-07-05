@@ -44,6 +44,13 @@ chatbot:
   - mo chatbot-dep+svc.yaml | kubectl delete -f - || true
   - mo chatbot-dep+svc.yaml | kubectl apply -f -
 
+chatbot-rag:
+  stage: deploy
+  script:
+  - cd deploy
+  - mo chatbot-rag-dep+svc.yaml | kubectl delete -f - || true
+  - mo chatbot-rag-dep+svc.yaml | kubectl apply -f -
+
 ingress:
     stage: expose
     script:
