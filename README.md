@@ -73,7 +73,7 @@ You can also use the port-forwarding features from the Lens-UI.
 
 By default, your services are made accessible to the general public externally by setting up an ingress. The pipeline provides a manually triggered ingress job in the expose stage. This makes your service available under the following externable reachable URL:
 
-`https://chatbot-<< PROJECT_ID >>.llm.mylab.th-luebeck.dev` or `https://chatbot-rag-<< PROJECT_ID >>.llm.mylab.th-luebeck.dev` (You find your project id in Gitlab! If you read this README.md in Gitlab (web browser), just scroll all the way up now. You will find the ID directly under the name of this repo.)
+`https://chatbot-<< PROJECT_ID >>.llm.mylab.th-luebeck.dev` or `https://chatbot-rag-<< PROJECT_ID >>.llm.mylab.th-luebeck.dev` (You find your project id in Gitlab! If you read this README.md in Gitlab (web browser), just scroll all the way up now. You will find the ID under the burger menu (&vellip;) next to the fork menu of this repo.
 
 Furthermore, you can add additional routes to the Ingress as needed and also set the update to automatic by commenting out the `when: manual` entry in the Ingress manifest `deploy/project-ing.yaml` or otherwise modifying the manifest file to suit your needs.
 
