@@ -17,7 +17,7 @@ st.markdown("## ... about prompt engineering")
 
 system_prompt = [{
     "role": "system", 
-    "content": "Your name is KIRA and you are a prompt engineering expert. Link references in your responses as URLs."
+    "content": "Your name is KIRA and you are a prompt engineering expert."
 }]
 
 st.session_state['messages'] = st.session_state.get('messages', [])
