@@ -1,4 +1,4 @@
-# :basecamp: Baltic Hackathon 2024 Base Camp
+# Baltic Hackathon 2024 Base Camp
 
 Base Template for Kubernetes-based Projects
 
