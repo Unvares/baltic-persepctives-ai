@@ -15,6 +15,9 @@ secrets:
       --docker-server=$CI_REGISTRY
       --docker-username=image-registry
       --docker-password=$CI_REGISTRY_TOKEN
+    - >
+      kubectl create secret generic api-secrets
+      --from-literal=OPENAI_API_KEY=$OPENAI_API_KEY
 
 volumes:
   stage: prepare
