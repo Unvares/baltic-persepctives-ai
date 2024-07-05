@@ -27,15 +27,8 @@ spec:
           requests:
             memory: 250M
             cpu: 100m
-        volumeMounts:
-        - name: data
-          mountPath: /data
       imagePullSecrets:
       - name: gitlab-registry-{{CI_PROJECT_ID}}
-      volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: demo-data
 ---
 apiVersion: v1
 kind: Service
