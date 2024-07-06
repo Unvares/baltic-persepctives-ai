@@ -3,6 +3,7 @@ import streamlit as st
 from openai import OpenAI
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
+from langchain_core.prompts import PromptTemplate
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "-")
 LLM_ENDPOINT = os.environ.get("LLM_ENDPOINT", "https://chat-large.llm.mylab.th-luebeck.dev/v1")
@@ -10,6 +11,11 @@ LLM_ENDPOINT = os.environ.get("LLM_ENDPOINT", "https://chat-large.llm.mylab.th-l
 embeddings = OpenAIEmbeddings(api_key=OPENAI_API_KEY)
 llm = OpenAI(base_url=LLM_ENDPOINT, api_key=OPENAI_API_KEY)
 vectorstore = Chroma(embedding_function=embeddings, persist_directory="/data")
+prompt_template = PromptTemplate.from_template("""
+Use the context to answer the query.
+Query: {query}
+Context: {context}
+""")
 
 st.set_page_config(page_title="KIRA", page_icon="🦜", menu_items={})
 st.title("🦜 Ask me anything ...")
@@ -42,7 +48,7 @@ if prompt := st.chat_input("🦜 Ask me anything about prompt engineering ..."):
         last_messages = st.session_state.messages[-2:] if len(st.session_state.messages) > 2 else st.session_state.messages
         completion = llm.chat.completions.create(
             messages=system_prompt + last_messages + [
-                { "role": "system", "content": f"Consider your knowledge base. Context:\n\n{ctx}" },
+                { "role": "system", "content": prompt_template.format(query=prompt, context=ctx) },
                 { "role": "user", "content": prompt }
             ],
             model="", stream=True, max_tokens=4000
