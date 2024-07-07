@@ -30,11 +30,11 @@ chatbot-img:
   stage: build
   image: docker:24
   services: ["docker:24-dind"]
-  only:
-    changes:
-    - chatbot/*
-    - chatbot/*/**
-    when: manual
+  rules:
+    - changes:
+      - chatbot/*
+      - chatbot/*/**
+    - when: manual
   script:
   - cd chatbot
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -45,11 +45,11 @@ chatbot-rag-img:
   stage: build
   image: docker:24
   services: ["docker:24-dind"]
-  only:
-    changes:
-    - chatbot-rag/*
-    - chatbot-rag/*/**
-    when: manual
+  rules:
+    - changes:
+      - chatbot-rag/*
+      - chatbot-rag/*/**
+    - when: manual
   script:
   - cd chatbot-rag
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
