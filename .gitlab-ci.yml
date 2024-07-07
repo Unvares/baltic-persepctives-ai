@@ -58,6 +58,7 @@ chatbot-rag-img:
 
 chatbot:
   stage: deploy
+  needs: ["chatbot-img"]
   script:
   - cd deploy
   - mo chatbot-dep+svc.yaml | kubectl delete -f - || true
@@ -65,13 +66,15 @@ chatbot:
 
 chatbot-rag:
   stage: deploy
+  needs: ["chatbot-rag-img"]
   script:
   - cd deploy
   - mo chatbot-rag-dep+svc.yaml | kubectl delete -f - || true
   - mo chatbot-rag-dep+svc.yaml | kubectl apply -f -
 
 ingress:
-    stage: expose
-    script:
-    - cd deploy
-    - mo project-ing.yaml | kubectl apply -f -
+  stage: expose
+  needs: ["secrets", "volumes"]
+  script:
+  - cd deploy
+  - mo project-ing.yaml | kubectl apply -f -
