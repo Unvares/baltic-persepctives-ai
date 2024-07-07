@@ -34,6 +34,7 @@ chatbot-img:
     changes:
     - chatbot/*
     - chatbot/*/**
+    when: manual
   script:
   - cd chatbot
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -48,6 +49,7 @@ chatbot-rag-img:
     changes:
     - chatbot-rag/*
     - chatbot-rag/*/**
+    when: manual
   script:
   - cd chatbot-rag
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
