@@ -7,7 +7,7 @@ from langchain_chroma import Chroma
 from langchain_core.prompts import PromptTemplate
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "-")
-LLM_ENDPOINT = os.environ.get("LLM_ENDPOINT", "https://chat-large.llm.mylab.th-luebeck.dev/v1")
+LLM_ENDPOINT = os.environ.get("LLM_ENDPOINT", "https://chat-default.llm.mylab.th-luebeck.dev/v1")
 EMBEDDING_EP = os.environ.get("EMBEDDING_EP", "https://bge-m3-embedding.llm.mylab.th-luebeck.dev/")
 
 embeddings = HuggingFaceEndpointEmbeddings(model=EMBEDDING_EP)

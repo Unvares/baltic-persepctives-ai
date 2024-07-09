@@ -17,7 +17,7 @@ spec:
         image: {{CI_REGISTRY_IMAGE}}/chatbot-rag:latest
         env:
         - name: LLM_ENDPOINT
-          value: "https://chat-large.llm.mylab.th-luebeck.dev/v1"
+          value: "https://chat-default.llm.mylab.th-luebeck.dev/v1"
         ports:
         - containerPort: 8501
         resources:

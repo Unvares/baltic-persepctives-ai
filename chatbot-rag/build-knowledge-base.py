@@ -10,7 +10,7 @@ from langchain_chroma import Chroma
 
 EMBEDDING_EP = os.environ.get("EMBEDDING_EP", "https://bge-m3-embedding.llm.mylab.th-luebeck.dev/")
 
-embeddings = HuggingFaceEndpointEmbeddings(model="https://bge-m3-embedding.llm.mylab.th-luebeck.dev")
+embeddings = HuggingFaceEndpointEmbeddings(model=EMBEDDING_EP)
 
 print("Downloading prompt engineering guide")
 url = 'https://github.com/dair-ai/Prompt-Engineering-Guide/archive/refs/heads/main.zip'
@@ -18,7 +18,7 @@ response = requests.get(url)
 with zipfile.ZipFile(io.BytesIO(response.content)) as the_zip_file:
     the_zip_file.extractall('/data') 
 
-text_splitter = text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=1000)
+text_splitter = text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=500)
 
 texts = list(glob("/data/Prompt-Engineering-Guide-main/ar-pages/**/*.ar.mdx"))
 chunks = []
