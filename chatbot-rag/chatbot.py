@@ -2,13 +2,15 @@ import os
 import streamlit as st
 from openai import OpenAI
 from langchain_openai import OpenAIEmbeddings
+from langchain_huggingface.embeddings import HuggingFaceEndpointEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.prompts import PromptTemplate
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "-")
 LLM_ENDPOINT = os.environ.get("LLM_ENDPOINT", "https://chat-large.llm.mylab.th-luebeck.dev/v1")
+EMBEDDING_EP = os.environ.get("EMBEDDING_EP", "https://bge-m3-embedding.llm.mylab.th-luebeck.dev/")
 
-embeddings = OpenAIEmbeddings(api_key=OPENAI_API_KEY)
+embeddings = HuggingFaceEndpointEmbeddings(model=EMBEDDING_EP)
 llm = OpenAI(base_url=LLM_ENDPOINT, api_key=OPENAI_API_KEY)
 vectorstore = Chroma(embedding_function=embeddings, persist_directory="/data")
 prompt_template = PromptTemplate.from_template("""
@@ -40,7 +42,7 @@ if prompt := st.chat_input("🦜 Ask me anything about prompt engineering ..."):
 
     with st.chat_message("ai"):
         with st.status("Querying knowledge base"):
-            retriever = vectorstore.as_retriever(search_kwargs={'k': 5})
+            retriever = vectorstore.as_retriever(search_kwargs={'k': 3})
             last_response = st.session_state.messages[-1]['content'] if st.session_state.messages else ""
             ctx = '\n\n'.join(c.page_content for c in retriever.invoke(last_response + "\n" + prompt))
             st.write(f"Found a context with {len(ctx)} characters.")
@@ -51,7 +53,7 @@ if prompt := st.chat_input("🦜 Ask me anything about prompt engineering ..."):
                 { "role": "system", "content": prompt_template.format(query=prompt, context=ctx) },
                 { "role": "user", "content": prompt }
             ],
-            model="", stream=True, max_tokens=4000
+            model="", stream=True, max_tokens=3000
         )
         response = st.write_stream(m.choices[0].delta.content for m in completion if not m.choices[0].finish_reason)
         st.session_state.messages.extend([

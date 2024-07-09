@@ -5,12 +5,12 @@ import io
 import os
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
+from langchain_huggingface.embeddings import HuggingFaceEndpointEmbeddings
 from langchain_chroma import Chroma
 
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "-")
+EMBEDDING_EP = os.environ.get("EMBEDDING_EP", "https://bge-m3-embedding.llm.mylab.th-luebeck.dev/")
 
-embeddings = OpenAIEmbeddings(api_key=OPENAI_API_KEY)
+embeddings = HuggingFaceEndpointEmbeddings(model="https://bge-m3-embedding.llm.mylab.th-luebeck.dev")
 
 print("Downloading prompt engineering guide")
 url = 'https://github.com/dair-ai/Prompt-Engineering-Guide/archive/refs/heads/main.zip'
@@ -18,12 +18,7 @@ response = requests.get(url)
 with zipfile.ZipFile(io.BytesIO(response.content)) as the_zip_file:
     the_zip_file.extractall('/data') 
 
-text_splitter = text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=3000,
-    chunk_overlap=500,
-    length_function=len,
-    is_separator_regex=False,
-)
+text_splitter = text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=1000)
 
 texts = list(glob("/data/Prompt-Engineering-Guide-main/ar-pages/**/*.ar.mdx"))
 chunks = []

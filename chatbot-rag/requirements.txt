@@ -5,4 +5,4 @@ langchain
 langchain-openai
 langchain-text-splitters 
 langchain-chroma
-langchain-experimental
+langchain-huggingface
