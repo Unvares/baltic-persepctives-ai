@@ -31,11 +31,42 @@ Already a pro? Just edit this README.md and make it your own.
 - `chatbot-rag/`: A simple Python ChatBot with a Prompt Engineering knowledge based (Streamlit and RAG-based). Take this as a base camp for your own projects if you want to make use of retrieval augmentend generation. This example stores the contents of [promptingguide.ai](https://www.promptingguide.ai/) in a vector store (customise as you see fit)
 - `notebooks/`: Examples of how to use language models programmatically (we recommend trying it out on our [JupyterHub](https://jhub.mylab.th-luebeck.de) system)
 
+### Build and run the basic chatbot locally
+
+To build and run the basic Chatbot do the following: 
+
+```
+cd chatbot
+docker build -t chatbot .
+docker run -p 8501:8501 chatbot
+```
+
+*The container build can take some time, especially during the first build on a host.*
+
+Now you can access the chatbot using this link [http://localhost:8501](http://localhost:8501).
+
+### Build and run the Prompt Engineering Chatbot locally
+
+To build and run the Prompt Engineering Chatbot with Retrieval Augmented Generation do the following: 
+
+```
+cd chatbot-rag
+docker build --build-arg EMBEDDING_EP=https://bge-m3-embedding.llm.mylab.th-luebeck.dev/ -t chatbot-rag .
+docker run -p 8502:8501 chatbot-rag
+```
+
+*The container build can even take some more time, especially during the first build on a host.*
+
+Now you can access the chatbot using this link [http://localhost:8502](http://localhost:8502).
+
+
 ### Deploy
 
-The pipeline is already prepared for automatic deployments.
+This repo contains a pipeline that is already prepared for automatic deployments. Whenever you push a commit to this repo, the pipeline is automatically started.
 
-Just start a new [deployment pipeline](../../../-/pipelines/new) to deploy the example `chatbot` service (ChatBot).
+However, you can trigger this process manually. Just start a new [deployment pipeline](../../../-/pipelines/new) to deploy the example `chatbot` service (ChatBot).
+
+***Be aware:** A pipeline run can take some time (up to 10 minutes). The necessary libraries compromise some machine learning libraries that have noteworthy download volumes.*
 
 ### Configure `kubectl` or `Lens`
 
