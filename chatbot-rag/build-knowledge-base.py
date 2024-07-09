@@ -18,7 +18,7 @@ response = requests.get(url)
 with zipfile.ZipFile(io.BytesIO(response.content)) as the_zip_file:
     the_zip_file.extractall('/data') 
 
-text_splitter = text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=500)
+text_splitter = text_splitter = RecursiveCharacterTextSplitter(chunk_size=7500, chunk_overlap=500)
 
 texts = list(glob("/data/Prompt-Engineering-Guide-main/ar-pages/**/*.ar.mdx"))
 chunks = []
