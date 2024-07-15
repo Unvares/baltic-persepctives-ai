@@ -4,8 +4,8 @@ Base Template for Kubernetes-based Projects
 
 This repo contains the examples from the videos:
 
-- "How to build a chatbot" and
-- "How to cure hallucinations of your chatbot"
+- ["How to build a chatbot"](https://youtu.be/Fz3aux9CxDM) and
+- ["How to cure hallucinations of your chatbot"](https://youtu.be/JWM2VamdM8c)
 
 > If you have no experience with Gitlab Pipelines and Kubernetes, but still want to get the most out of this template, try to find computer science students from TH Lübeck who have either taken the master courses **"Cloud-native Programming"**, **"Cloud-native Architectures"** or the bachelor module **"Web and Cloud Computing Project"**.
 > This group of students has experience with this tool chain and DevOps experience.
