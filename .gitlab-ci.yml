@@ -4,7 +4,6 @@ stages:
   - prepare
   - build
   - deploy
-  - expose
 
 variables:
   EMBEDDING_EP: "https://bge-m3-embedding.llm.mylab.th-luebeck.dev/"
@@ -134,11 +133,10 @@ frontend:
     - when: manual
 
 ingress:
-  stage: expose
+  stage: deploy
   needs: [ "secrets", "volumes" ]
   script:
     - cd deploy
     - mo project-ing.yaml | kubectl apply -f -
   rules:
-    - if: $CI_COMMIT_REF_SLUG == "main"
-      when: manual
+    - when: manual
