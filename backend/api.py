@@ -6,6 +6,8 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableBranch
 from langchain_openai import ChatOpenAI
 from langserve import add_routes
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_community.chat_message_histories import ChatMessageHistory
 
 # Initialize OpenAI client
 LLM_ENDPOINT = os.environ.get("LLM_ENDPOINT", "https://chat-large.llm.mylab.th-luebeck.dev/v1")
@@ -47,6 +49,7 @@ prompt_germany = ChatPromptTemplate.from_messages(
             "official nor formal way. You will answer in the same language as the person you are speaking with."
             "{answer_tone}",
         ),
+        ("placeholder", "{chat_history}"),
         ("human", "{question}"),
     ]
 )
@@ -60,6 +63,7 @@ prompt_sweden = ChatPromptTemplate.from_messages(
             "official nor formal way. You will answer in the same language as the person you are speaking with."
             "{answer_tone}",
         ),
+        ("placeholder", "{chat_history}"),
         ("human", "{question}"),
     ]
 )
@@ -73,6 +77,15 @@ branch = RunnableBranch(
     runnable_germany,
 )
 full_chain = {"topic": lambda x: x["topic"], "question": lambda x: x["question"], 'answer_tone': tone_chain} | branch
+
+demo_ephemeral_chat_history_for_chain = ChatMessageHistory()
+
+chain_with_message_history = RunnableWithMessageHistory(
+    full_chain,
+    lambda session_id: demo_ephemeral_chat_history_for_chain,
+    input_messages_key="input",
+    history_messages_key="chat_history",
+)
 
 app = FastAPI(
     title="LangChain Server",
