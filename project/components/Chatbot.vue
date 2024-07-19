@@ -177,7 +177,6 @@ function scrollToChatEnd() {
     height: 100%;
     top: 0;
     left: 0;
-    background: url("assets/images/logo_static.svg");
     mix-blend-mode: overlay;
     background-size: clamp(200px, 80%, 600px);
     background-position: center 30%;
