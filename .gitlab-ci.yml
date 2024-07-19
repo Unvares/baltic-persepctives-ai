@@ -1,10 +1,10 @@
 image: 'thlmylab/swakkd:stable'
 
 stages:
-- prepare
-- build
-- deploy
-- expose
+  - prepare
+  - build
+  - deploy
+  - expose
 
 variables:
   EMBEDDING_EP: "https://bge-m3-embedding.llm.mylab.th-luebeck.dev/"
@@ -33,11 +33,11 @@ volumes:
 chatbot-img:
   stage: build
   image: docker:24
-  services: ["docker:24-dind"]
+  services: [ "docker:24-dind" ]
   rules:
     - changes:
-      - chatbot/*
-      - chatbot/*/**
+        - chatbot/*
+        - chatbot/*/**
     - when: manual
     - if: $CI_COMMIT_REF_SLUG == "main"
   script:
@@ -49,11 +49,11 @@ chatbot-img:
 chatbot-rag-img:
   stage: build
   image: docker:24
-  services: ["docker:24-dind"]
+  services: [ "docker:24-dind" ]
   rules:
     - changes:
-      - chatbot-rag/*
-      - chatbot-rag/*/**
+        - chatbot-rag/*
+        - chatbot-rag/*/**
     - when: manual
     - if: $CI_COMMIT_REF_SLUG == "main"
   script:
@@ -65,11 +65,11 @@ chatbot-rag-img:
 langserve-img:
   stage: build
   image: docker:24
-  services: ["docker:24-dind"]
+  services: [ "docker:24-dind" ]
   rules:
     - changes:
-      - backend/*
-      - backend/*/**
+        - backend/*
+        - backend/*/**
     - when: manual
     - if: $CI_COMMIT_REF_SLUG == "main"
   script:
@@ -78,9 +78,24 @@ langserve-img:
     - docker build --build-arg API_KEY=$API_KEY -t $CI_REGISTRY_IMAGE/langserve:latest .
     - docker push $CI_REGISTRY_IMAGE/langserve:latest
 
+frontend-img:
+  stage: build
+  image: docker:24
+  services: [ "docker:24-dind" ]
+  rules:
+    - changes:
+        - project/*
+        - project/*/**
+    - when: manual
+  script:
+    - cd project
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --build-arg EMBEDDING_EP=$EMBEDDING_EP -t $CI_REGISTRY_IMAGE/frontend:latest .
+    - docker push $CI_REGISTRY_IMAGE/frontend:latest
+
 chatbot:
   stage: deploy
-  needs: ["chatbot-img"]
+  needs: [ "chatbot-img" ]
   script:
     - cd deploy
     - mo chatbot-dep+svc.yaml | kubectl delete -f - || true
@@ -90,7 +105,7 @@ chatbot:
 
 chatbot-rag:
   stage: deploy
-  needs: ["chatbot-rag-img"]
+  needs: [ "chatbot-rag-img" ]
   script:
     - cd deploy
     - mo chatbot-rag-dep+svc.yaml | kubectl delete -f - || true
@@ -100,7 +115,7 @@ chatbot-rag:
 
 langserve-rag:
   stage: deploy
-  needs: ["langserve-img"]
+  needs: [ "langserve-img" ]
   script:
     - cd deploy
     - mo langserve-dep+svc.yaml | kubectl delete -f - || true
@@ -108,9 +123,19 @@ langserve-rag:
   rules:
     - if: $CI_COMMIT_REF_SLUG == "main"
 
+frontend:
+  stage: deploy
+  needs: [ "frontend-img" ]
+  script:
+    - cd deploy
+    - mo frontend-dep+svc.yaml | kubectl delete -f - || true
+    - mo frontend-dep+svc.yaml | kubectl apply -f -
+  rules:
+    - when: manual
+
 ingress:
   stage: expose
-  needs: ["secrets", "volumes"]
+  needs: [ "secrets", "volumes" ]
   script:
     - cd deploy
     - mo project-ing.yaml | kubectl apply -f -
