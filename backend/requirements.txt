@@ -3,3 +3,4 @@ langchain-core
 langchain-openai
 langserve
 uvicorn
+sse_starlette
