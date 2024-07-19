@@ -1,11 +1,3 @@
-/*
- *
- * Example of how request handling could look like
- * 
- * This component is responsible for processing user requests.
- *
- */
-
 import { fetchResponse } from '~/server/AiManager';
 import type { Message } from '@/types';
 import { readBody } from 'h3';
