@@ -10,7 +10,7 @@ from langserve import add_routes
 # Initialize OpenAI client
 LLM_ENDPOINT = os.environ.get("LLM_ENDPOINT", "https://chat-large.llm.mylab.th-luebeck.dev/v1")
 API_KEY = "sk-proj-AdIuNRsaRBF521qXqYoST3BlbkFJBxgJ7H7mTT8u3uN9xmG5"
-model = ChatOpenAI(streaming=True, api_key=API_KEY)
+model = ChatOpenAI(streaming=True, api_key=API_KEY, model="gpt-4o-mini")
 
 prompt_tone = ChatPromptTemplate.from_template("""
 Is the following user prompt more passive or active?
