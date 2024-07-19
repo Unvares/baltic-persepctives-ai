@@ -137,5 +137,3 @@ ingress:
   script:
     - cd deploy
     - mo project-ing.yaml | kubectl apply -f -
-  rules:
-    - when: manual
