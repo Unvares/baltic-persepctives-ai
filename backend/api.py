@@ -2,7 +2,7 @@ import os
 
 from fastapi import FastAPI
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableBranch
 from langchain_openai import ChatOpenAI
 from langserve import add_routes
@@ -12,13 +12,40 @@ LLM_ENDPOINT = os.environ.get("LLM_ENDPOINT", "https://chat-large.llm.mylab.th-l
 API_KEY = "-"
 model = ChatOpenAI(streaming=True, api_key=API_KEY, base_url=LLM_ENDPOINT)
 
+prompt_tone = ChatPromptTemplate.from_template("""
+Is the following user prompt more passive or active?
+By active I mean is user actively trying to forward a conversation.
+By passive i mean asking generic questions or making generic statements.
+Answer exactly "{active}" if tone is active or "{passive}" if tone is passive
+
+Question: {question}
+""")
+
+passive_tone = """
+Try to encourage user to ask more questions.
+Try to forward the conversation.
+"""
+
+active_tone = """
+Let the user lead conversation. Let them ask questions without your prompting
+"""
+
+tone_chain = ({'passive': lambda x: passive_tone,
+               'active': lambda x: active_tone,
+               'question': lambda x: x['question']
+               }
+              | prompt_tone
+              | model
+              | StrOutputParser())
+
 prompt_germany = ChatPromptTemplate.from_messages(
     [
         (
             "system",
             "You are a german computer science student and wanting to help the user asking questions. Greet "
             "the user with Hello in your own language only the first time. Then continue in the users language. Write in a non "
-            "official nor formal way. You will answer in the same language as the person you are speaking with.",
+            "official nor formal way. You will answer in the same language as the person you are speaking with."
+            "{answer_tone}",
         ),
         ("human", "{question}"),
     ]
@@ -30,7 +57,8 @@ prompt_sweden = ChatPromptTemplate.from_messages(
             "system",
             "You are a swedish computer science student and wanting to help the user asking questions. Greet "
             "the user with Hello in your own language only the first time. Then continue in the users language. Write in a non "
-            "official nor formal way. You will answer in the same language as the person you are speaking with.",
+            "official nor formal way. You will answer in the same language as the person you are speaking with."
+            "{answer_tone}",
         ),
         ("human", "{question}"),
     ]
@@ -39,28 +67,12 @@ prompt_sweden = ChatPromptTemplate.from_messages(
 runnable_germany = prompt_germany | model | StrOutputParser()
 runnable_sweden = prompt_sweden | model | StrOutputParser()
 
-chain = (
-    PromptTemplate.from_template(
-        """Given the user question below, classify it as either being `sweden`, `german`, or `other`.
-
-Do not respond with more than one word.
-
-<question>
-{question}
-</question>
-
-Classification:"""
-    )
-    | model
-    | StrOutputParser()
-)
-
 branch = RunnableBranch(
     (lambda x: "sweden" in x["topic"].lower(), runnable_sweden),
     (lambda x: "germany" in x["topic"].lower(), runnable_germany),
     runnable_germany,
 )
-full_chain = {"topic": lambda x: x["topic"], "question": lambda x: x["question"]} | branch
+full_chain = {"topic": lambda x: x["topic"], "question": lambda x: x["question"], 'answer_tone': tone_chain} | branch
 
 app = FastAPI(
     title="LangChain Server",
