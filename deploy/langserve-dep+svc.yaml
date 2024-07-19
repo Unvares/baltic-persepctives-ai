@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: langserve
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: langserve
+  template:
+    metadata:
+      labels:
+        app: langserve
+    spec:
+      containers:
+      - name: langserve
+        image: {{CI_REGISTRY_IMAGE}}/langserve:latest
+        env:
+        - name: LLM_ENDPOINT
+          value: "https://chat-large.llm.mylab.th-luebeck.dev/v1"
+        - name: API_KEY
+          value: {{API_KEY}}
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            memory: 1000M
+            cpu: 250m
+          requests:
+            memory: 250M
+            cpu: 100m
+      imagePullSecrets:
+      - name: gitlab-registry-{{CI_PROJECT_ID}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: langserve
+  labels:
+    app: langserve
+spec:
+  type: ClusterIP
+  selector:
+    app: langserve
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
