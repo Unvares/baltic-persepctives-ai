@@ -11,20 +11,24 @@ variables:
   API_KEY: "$API_KEY"
 
 secrets:
-    stage: prepare
-    script:
+  stage: prepare
+  script:
     - kubectl delete secret gitlab-registry-$CI_PROJECT_ID || true
     - >
       kubectl create secret docker-registry gitlab-registry-$CI_PROJECT_ID
       --docker-server=$CI_REGISTRY
       --docker-username=image-registry
       --docker-password=$CI_REGISTRY_TOKEN
+  rules:
+    - if: $CI_COMMIT_REF_SLUG == "main"
 
 volumes:
   stage: prepare
   script:
-  - cd deploy
-  - kubectl apply -f demo-pvc.yaml
+    - cd deploy
+    - kubectl apply -f demo-pvc.yaml
+  rules:
+    - if: $CI_COMMIT_REF_SLUG == "main"
 
 chatbot-img:
   stage: build
@@ -35,11 +39,12 @@ chatbot-img:
       - chatbot/*
       - chatbot/*/**
     - when: manual
+    - if: $CI_COMMIT_REF_SLUG == "main"
   script:
-  - cd chatbot
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  - docker build -t $CI_REGISTRY_IMAGE/chatbot:latest .
-  - docker push $CI_REGISTRY_IMAGE/chatbot:latest
+    - cd chatbot
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE/chatbot:latest .
+    - docker push $CI_REGISTRY_IMAGE/chatbot:latest
 
 chatbot-rag-img:
   stage: build
@@ -50,11 +55,12 @@ chatbot-rag-img:
       - chatbot-rag/*
       - chatbot-rag/*/**
     - when: manual
+    - if: $CI_COMMIT_REF_SLUG == "main"
   script:
-  - cd chatbot-rag
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  - docker build --build-arg EMBEDDING_EP=$EMBEDDING_EP -t $CI_REGISTRY_IMAGE/chatbot-rag:latest .
-  - docker push $CI_REGISTRY_IMAGE/chatbot-rag:latest
+    - cd chatbot-rag
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --build-arg EMBEDDING_EP=$EMBEDDING_EP -t $CI_REGISTRY_IMAGE/chatbot-rag:latest .
+    - docker push $CI_REGISTRY_IMAGE/chatbot-rag:latest
 
 langserve-img:
   stage: build
@@ -65,39 +71,48 @@ langserve-img:
       - backend/*
       - backend/*/**
     - when: manual
+    - if: $CI_COMMIT_REF_SLUG == "main"
   script:
-  - cd backend
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  - docker build --build-arg API_KEY=$API_KEY -t $CI_REGISTRY_IMAGE/langserve:latest .
-  - docker push $CI_REGISTRY_IMAGE/langserve:latest
+    - cd backend
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --build-arg API_KEY=$API_KEY -t $CI_REGISTRY_IMAGE/langserve:latest .
+    - docker push $CI_REGISTRY_IMAGE/langserve:latest
 
 chatbot:
   stage: deploy
   needs: ["chatbot-img"]
   script:
-  - cd deploy
-  - mo chatbot-dep+svc.yaml | kubectl delete -f - || true
-  - mo chatbot-dep+svc.yaml | kubectl apply -f -
+    - cd deploy
+    - mo chatbot-dep+svc.yaml | kubectl delete -f - || true
+    - mo chatbot-dep+svc.yaml | kubectl apply -f -
+  rules:
+    - if: $CI_COMMIT_REF_SLUG == "main"
 
 chatbot-rag:
   stage: deploy
   needs: ["chatbot-rag-img"]
   script:
-  - cd deploy
-  - mo chatbot-rag-dep+svc.yaml | kubectl delete -f - || true
-  - mo chatbot-rag-dep+svc.yaml | kubectl apply -f -
+    - cd deploy
+    - mo chatbot-rag-dep+svc.yaml | kubectl delete -f - || true
+    - mo chatbot-rag-dep+svc.yaml | kubectl apply -f -
+  rules:
+    - if: $CI_COMMIT_REF_SLUG == "main"
 
 langserve-rag:
   stage: deploy
   needs: ["langserve-img"]
   script:
-  - cd deploy
-  - mo langserve-dep+svc.yaml | kubectl delete -f - || true
-  - mo langserve-dep+svc.yaml | kubectl apply -f -
+    - cd deploy
+    - mo langserve-dep+svc.yaml | kubectl delete -f - || true
+    - mo langserve-dep+svc.yaml | kubectl apply -f -
+  rules:
+    - if: $CI_COMMIT_REF_SLUG == "main"
 
 ingress:
   stage: expose
   needs: ["secrets", "volumes"]
   script:
-  - cd deploy
-  - mo project-ing.yaml | kubectl apply -f -
+    - cd deploy
+    - mo project-ing.yaml | kubectl apply -f -
+  rules:
+    - if: $CI_COMMIT_REF_SLUG == "main"
