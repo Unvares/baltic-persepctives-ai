@@ -112,7 +112,7 @@ app.add_middleware(
 
 add_routes(
     app,
-    chain_with_message_history,
+    full_chain,
     path="/openai",
 )
 
