@@ -140,8 +140,8 @@ async function submitResponse() {
   await nextTick();
   scrollToChatEnd();
   try {
-    // const response = await axios.post("/api/AiHandler", store.messages);
-    // store.addMessage(response.data);
+    const response = await axios.post("/api/AiHandler", store.messages);
+    store.addMessage(response.data);
     await nextTick();
     scrollToChatEnd();
   } catch (error) {

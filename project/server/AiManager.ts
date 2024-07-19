@@ -1,22 +1,13 @@
-/*
- *
- * Example of how a mesage generation would look like using OpenAI API
- * with an API key define in .env of the root folder.
- * 
- * This component is responsible for communication with OpenAI API
- *
- */
-
 import OpenAI from 'openai'
 import type {Message} from '@/types';
 
-const client = new OpenAI({
-    apiKey: "Ligma"
+const openai = new OpenAI({
+  apiKey: "sk-proj-AdIuNRsaRBF521qXqYoST3BlbkFJBxgJ7H7mTT8u3uN9xmG5"
 });
 
 export async function fetchResponse(requestMessages: Message[]): Promise<Message> {
-    const response = await client.chat.completions.create({
-        model: "gpt-3.5-turbo-1106",
+    const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
         messages: requestMessages
     });
 
