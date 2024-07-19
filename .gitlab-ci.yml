@@ -4,6 +4,7 @@ stages:
   - prepare
   - build
   - deploy
+  - expose
 
 variables:
   EMBEDDING_EP: "https://bge-m3-embedding.llm.mylab.th-luebeck.dev/"
@@ -133,7 +134,9 @@ frontend:
     - when: manual
 
 ingress:
-  stage: deploy
+  stage: expose
   script:
     - cd deploy
     - mo project-ing.yaml | kubectl apply -f -
+  rules:
+    - when: manual
