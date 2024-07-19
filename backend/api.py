@@ -1,0 +1,80 @@
+import os
+
+from fastapi import FastAPI
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from langchain_core.runnables import RunnableBranch
+from langchain_openai import ChatOpenAI
+from langserve import add_routes
+
+# Initialize OpenAI client
+LLM_ENDPOINT = os.environ.get("LLM_ENDPOINT", "https://chat-large.llm.mylab.th-luebeck.dev/v1")
+API_KEY = "-"
+model = ChatOpenAI(streaming=True, api_key=API_KEY, base_url=LLM_ENDPOINT)
+
+prompt_germany = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "You are a german computer science student and wanting to help the user asking questions. Greet "
+            "the user with Hello in your own language only the first time. Then continue in the users language. Write in a non "
+            "official nor formal way. You will answer in the same language as the person you are speaking with.",
+        ),
+        ("human", "{question}"),
+    ]
+)
+
+prompt_sweden = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "You are a swedish computer science student and wanting to help the user asking questions. Greet "
+            "the user with Hello in your own language only the first time. Then continue in the users language. Write in a non "
+            "official nor formal way. You will answer in the same language as the person you are speaking with.",
+        ),
+        ("human", "{question}"),
+    ]
+)
+
+runnable_germany = prompt_germany | model | StrOutputParser()
+runnable_sweden = prompt_sweden | model | StrOutputParser()
+
+chain = (
+    PromptTemplate.from_template(
+        """Given the user question below, classify it as either being `sweden`, `german`, or `other`.
+
+Do not respond with more than one word.
+
+<question>
+{question}
+</question>
+
+Classification:"""
+    )
+    | model
+    | StrOutputParser()
+)
+
+branch = RunnableBranch(
+    (lambda x: "sweden" in x["topic"].lower(), runnable_sweden),
+    (lambda x: "germany" in x["topic"].lower(), runnable_germany),
+    runnable_germany,
+)
+full_chain = {"topic": lambda x: x["topic"], "question": lambda x: x["question"]} | branch
+
+app = FastAPI(
+    title="LangChain Server",
+    version="1.0",
+    description="Spin up a simple api server using Langchain's Runnable interfaces",
+)
+
+add_routes(
+    app,
+    full_chain,
+    path="/openai",
+)
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="localhost", port=8080)

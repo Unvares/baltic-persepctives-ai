@@ -55,6 +55,21 @@ chatbot-rag-img:
   - docker build --build-arg EMBEDDING_EP=$EMBEDDING_EP -t $CI_REGISTRY_IMAGE/chatbot-rag:latest .
   - docker push $CI_REGISTRY_IMAGE/chatbot-rag:latest
 
+langserve-img:
+  stage: build
+  image: docker:24
+  services: ["docker:24-dind"]
+  rules:
+    - changes:
+      - backend/*
+      - backend/*/**
+    - when: manual
+  script:
+  - cd backend
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  - docker build -t $CI_REGISTRY_IMAGE/langserve:latest .
+  - docker push $CI_REGISTRY_IMAGE/langserve:latest
+
 chatbot:
   stage: deploy
   needs: ["chatbot-img"]
@@ -70,6 +85,14 @@ chatbot-rag:
   - cd deploy
   - mo chatbot-rag-dep+svc.yaml | kubectl delete -f - || true
   - mo chatbot-rag-dep+svc.yaml | kubectl apply -f -
+
+langserve-rag:
+  stage: deploy
+  needs: ["langserve-img"]
+  script:
+  - cd deploy
+  - mo langserve-dep+svc.yaml | kubectl delete -f - || true
+  - mo langserve-dep+svc.yaml | kubectl apply -f -
 
 ingress:
   stage: expose
