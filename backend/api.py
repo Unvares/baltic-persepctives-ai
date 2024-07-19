@@ -9,7 +9,7 @@ from langserve import add_routes
 
 # Initialize OpenAI client
 LLM_ENDPOINT = os.environ.get("LLM_ENDPOINT", "https://chat-large.llm.mylab.th-luebeck.dev/v1")
-API_KEY = os.environ['API_KEY']
+API_KEY = os.environ.get("API_KEY", "-")
 model = ChatOpenAI(streaming=True, api_key=API_KEY, model="gpt-4o-mini")
 
 prompt_tone = ChatPromptTemplate.from_template("""

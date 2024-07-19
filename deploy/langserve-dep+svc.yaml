@@ -18,6 +18,8 @@ spec:
         env:
         - name: LLM_ENDPOINT
           value: "https://chat-large.llm.mylab.th-luebeck.dev/v1"
+        - name: API_KEY
+          value: {{API_KEY}}
         ports:
         - containerPort: 8080
         resources:
