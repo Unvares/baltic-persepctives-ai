@@ -134,7 +134,6 @@ frontend:
 
 ingress:
   stage: deploy
-  needs: [ "secrets", "volumes" ]
   script:
     - cd deploy
     - mo project-ing.yaml | kubectl apply -f -
