@@ -37,7 +37,7 @@ def _per_request_config_modifier(
 
 
 full_chain = {"topic": lambda x: x["topic"], "question": lambda x: x["question"], "input": lambda x: x["question"],
-              'answer_tone': tone_chain, 'character': branch,  'new_topic': lambda x: get_persona_chain(x['question'])[:3].lower(), 'language': language_chain} | chain_with_history
+              'answer_tone': tone_chain, 'character': branch,  'new_topic': lambda x: get_persona_chain(x['topic'], x['question'])[:3].lower(), 'language': language_chain} | chain_with_history
 
 app = FastAPI(
     title="LangChain Server",

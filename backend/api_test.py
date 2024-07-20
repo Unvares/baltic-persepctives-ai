@@ -38,16 +38,16 @@ def _per_request_config_modifier(
 
 
 full_chain = {"topic": lambda x: x["topic"], "question": lambda x: x["question"], "input": lambda x: x["question"],
-              'answer_tone': tone_chain, 'character': branch,  'new_topic': lambda x: get_persona_chain(x['question'])[:3].lower(), 'language': language_chain} | chain_with_history
+              'answer_tone': tone_chain, 'character': branch,  'new_topic': lambda x: get_persona_chain(x['topic'], x['question'])[:3].lower(), 'language': language_chain} | chain_with_history
 
 if __name__ == "__main__":
     conversation_id = str(uuid.uuid4())
     configuration = {'configurable': {'conversation_id': conversation_id, 'user_id': 'textuser'}}
-    out = full_chain.invoke({"topic": "swe", "question": "How many citizens do koeln have?"}, configuration)
+    out = full_chain.invoke({"topic": "swe", "question": "Tell me about yourself"}, configuration)
     print(out)
 
-    out2 = full_chain.invoke({"topic": "swe", "question": "Tell me something about studying in sweden."}, configuration)
-    print(out2)
+    # out2 = full_chain.invoke({"topic": "swe", "question": "Tell me something about studying in sweden."}, configuration)
+    # print(out2)
 
-    out3 = full_chain.invoke({"topic": "swe", "question": "What did I ask you before?"}, configuration)
-    print(out3)
+    # out3 = full_chain.invoke({"topic": "swe", "question": "What did I ask you before?"}, configuration)
+    # print(out3)
