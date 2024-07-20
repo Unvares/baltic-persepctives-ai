@@ -26,7 +26,7 @@ def get_persona_chain(question):
     persona_chain = (PromptTemplate.from_template(
         """Given the user question below, detect the country that the content of the question has the biggest relation to as its english name.
                         Differentiate between the countries 'sweden', 'denmark', 'lithuania', 'iceland', 'norway', 'latvia',
-                        'finland', 'poland', 'germany', 'estonia'.
+                        'finland', 'poland', 'germany', 'estonia'. If you cant find no matches use 'poland' as the value.
 
                         Do not respond with more than one word or uppercase letters.
 
