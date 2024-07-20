@@ -1,5 +1,6 @@
 import os
 import re
+import uuid
 from pathlib import Path
 from typing import Any, Callable, Dict, Union
 
@@ -19,10 +20,11 @@ from typing_extensions import TypedDict
 from topic_chain import branch
 from tone_chain import tone_chain
 from history_chain import chain_with_history
-from chatbot_model import get_model
 
 # Initialize OpenAI client
-model = get_model()
+LLM_ENDPOINT = os.environ.get("LLM_ENDPOINT", "https://chat-large.llm.mylab.th-luebeck.dev/v1")
+API_KEY = os.environ.get("API_KEY", "-")
+model = ChatOpenAI(streaming=True, api_key=API_KEY, model="gpt-4o-mini")
 
 
 def _per_request_config_modifier(
@@ -47,31 +49,14 @@ def _per_request_config_modifier(
 
 full_chain = {"topic": lambda x: x["topic"], "question": lambda x: x["question"], 'answer_tone': tone_chain, 'character': branch} | chain_with_history
 
-app = FastAPI(
-    title="LangChain Server",
-    version="1.0",
-    description="Spin up a simple api server using Langchain's Runnable interfaces",
-)
-
-# Set all CORS enabled origins
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"],
-)
-
-add_routes(
-    app,
-    full_chain,
-    per_req_config_modifier=_per_request_config_modifier,
-    path="/openai",
-    disabled_endpoints=["playground", "batch"],
-)
-
 if __name__ == "__main__":
-    import uvicorn
+    conversation_id = str(uuid.uuid4())
+    configuration = {'configurable': {'conversation_id': conversation_id, 'user_id': 'textuser'}}
+    out = full_chain.invoke({"topic": "sweden", "question": "Who are you?"}, configuration)
+    print(out)
 
-    uvicorn.run(app, host="localhost", port=8080)
+    out2 = full_chain.invoke({"topic": "sweden", "question": "Tell me something about studying in sweden."}, configuration)
+    print(out2)
+
+    out3 = full_chain.invoke({"topic": "sweden", "question": "What did I ask you before?"}, configuration)
+    print(out3)
