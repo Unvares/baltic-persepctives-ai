@@ -99,12 +99,15 @@ final_prompt = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            """{character} {answer_tone}""",
+            """Language to answer in: {language} 
+            Character you are: {character}
+            {answer_tone}""",
         ),
         MessagesPlaceholder(variable_name="history"),
         ("human", "{question}"),
     ]
 )
+
 
 model = get_model()
 final_chain = final_prompt | model | StrOutputParser()

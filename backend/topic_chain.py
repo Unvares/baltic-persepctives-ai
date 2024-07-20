@@ -20,18 +20,12 @@ from personas import PERSONAS
 
 
 def create_persona_chain(country):
-    person_prompt = ChatPromptTemplate.from_messages(
-    [
-        (
-            "system",
-            f"{PERSONAS[country]}"
-            "{answer_tone}",
-        ),
-        ("human", "{question}"),
+    prompt_character = ChatPromptTemplate.from_messages([
+        ('system', f"You are the following person: {PERSONAS[country]}")
     ])
-    return person_prompt
+    return prompt_character
 
 
 branch = RunnableLambda(
-    lambda x: create_persona_chain(x['topic']).lower()
+    lambda x: create_persona_chain(x['topic'])
 )

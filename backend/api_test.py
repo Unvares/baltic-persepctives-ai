@@ -17,6 +17,8 @@ from langchain_openai import ChatOpenAI
 from langserve import add_routes
 from starlette.middleware.cors import CORSMiddleware
 from typing_extensions import TypedDict
+
+from language_chain import language_chain
 from topic_chain import branch
 from tone_chain import tone_chain
 from history_chain import chain_with_history
@@ -47,7 +49,7 @@ def _per_request_config_modifier(
     return config
 
 
-full_chain = {"topic": lambda x: x["topic"], "question": lambda x: x["question"], 'answer_tone': tone_chain, 'character': branch} | chain_with_history
+full_chain = {"topic": lambda x: x["topic"], "question": lambda x: x["question"], 'answer_tone': tone_chain, 'character': branch, 'language': language_chain} | chain_with_history
 
 if __name__ == "__main__":
     conversation_id = str(uuid.uuid4())
