@@ -6,7 +6,7 @@ export const useLangChain = () => {
   useCookie("user_id").value = userId;
 
   const remoteChain = new RemoteRunnable({
-    url: "https://langserve-14565.llm.mylab.th-luebeck.dev/openai/",
+    url: "http://localhost:8080/openai/",
   });
 
   const invoke = async (params: Record<string, unknown>) => {
