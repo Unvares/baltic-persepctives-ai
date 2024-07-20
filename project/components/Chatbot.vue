@@ -1,5 +1,5 @@
 <template>
-  <div class="chatbot" :class="chatbotClasses">
+  <div class="chatbot">
     <div>
       <div class="chatbot__header">
         <v-app-bar-nav-icon
@@ -98,11 +98,6 @@ import axios from "axios";
 const { invoke } = useLangChain();
 
 const { xs, sm } = useDisplay();
-const chatbotClasses = ref({});
-onMounted(
-  () => (chatbotClasses.value = { chatbot_mobile: xs, chatbot_tablet: sm })
-);
-
 const store = useChatbotStore();
 const messages = computed(() =>
   store.messages.filter((message) => message.role !== "system")
@@ -258,14 +253,6 @@ function scrollToChatEnd() {
       opacity: 1;
     }
   }
-}
-
-.chatbot_tablet {
-  width: 60%;
-}
-
-.chatbot_mobile {
-  width: 80%;
 }
 
 .messages {
