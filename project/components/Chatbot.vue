@@ -80,7 +80,17 @@
         :role="message.role"
         :country="message.country"
       >
-        {{ message.content }}
+        <template v-if="message.content">
+          {{ message.content }}
+        </template>
+        <template v-else>
+          <img
+            width="30px"
+            height="30px"
+            src="@/assets/images/loading.svg"
+            alt="Loading"
+          />
+        </template>
       </MessageBubble>
     </div>
     <div class="input-form">
@@ -147,7 +157,8 @@ const computedMessages = computed(() => {
 });
 
 async function submitResponse() {
-  if (!textFieldHasText.value) return;
+  if (!textFieldHasText.value || isLoading.value) return;
+  isLoading.value = true;
   const messageObject = {
     content: textAreaValue.value,
     role: "user",
@@ -157,6 +168,21 @@ async function submitResponse() {
   textAreaValue.value = "";
   await nextTick();
   scrollToChatEnd();
+
+  if (store.selectedRegion?.code) {
+    store.addMessage({
+      content: "",
+      role: "assistant",
+      country: store.selectedRegion.code,
+    });
+  } else {
+    store.addMessage({
+      content: "",
+      role: "assistant",
+      country: "pol",
+    });
+  }
+
   try {
     const safeDialogueDetails = store.selectedRegion?.code || "group";
 
@@ -168,22 +194,12 @@ async function submitResponse() {
 
     const { country, message } = parseResponse(response as string);
 
-    if (store.selectedRegion?.code) {
-      store.addMessage({
-        content: message as string,
-        role: "assistant",
-        country: store.selectedRegion.code,
-      });
-    } else {
-      store.addMessage({
-        content: message as string,
-        role: "assistant",
-        country: (country as CountryCode | undefined) ?? "pol",
-      });
-    }
-
+    store.messages[store.messages.length - 1].content = response as string;
+    store.messages[store.messages.length - 1].country =
+      (country as CountryCode | undefined) ?? "pol";
     await nextTick();
     scrollToChatEnd();
+    isLoading.value = false;
   } catch (error) {
     console.error("Error communicating with AI:", error);
   }
@@ -206,8 +222,10 @@ const textFieldHasText = computed(() => {
 });
 
 const sendButtonActiveClass = computed(() =>
-  textFieldHasText.value ? "send_button_active" : ""
+  textFieldHasText.value && !isLoading ? "send_button_active" : ""
 );
+
+const isLoading = ref(false);
 </script>
 
 <style scoped lang="scss">
