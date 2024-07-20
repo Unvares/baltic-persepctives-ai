@@ -20,9 +20,6 @@ export const representants = {
   PL: {
     name: "Kamil Nowak",
   },
-  RU: {
-    name: "Ivan Petrov",
-  },
   SE: {
     name: "Anna Andersson",
   },
