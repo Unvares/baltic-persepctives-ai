@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: {{CI_REGISTRY_IMAGE}}/frontend:latest
+        ports:
+        - containerPort: 3000
+        resources:
+          limits:
+            memory: 1000M
+            cpu: 250m
+          requests:
+            memory: 250M
+            cpu: 100m
+      imagePullSecrets:
+      - name: gitlab-registry-{{CI_PROJECT_ID}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  labels:
+    app: frontend
+spec:
+  type: ClusterIP
+  selector:
+    app: frontend
+  ports:
+  - name: http
+    port: 3000
+    targetPort: 3000

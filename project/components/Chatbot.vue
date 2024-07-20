@@ -91,7 +91,11 @@ import type { Message } from "@/types";
 import { flagsData } from "@/auxillary/flags";
 import { representants } from "@/auxillary/representants";
 
+import { useLangChain } from "@/composables/useLangChain";
+
 import axios from "axios";
+
+const { invoke } = useLangChain();
 
 const { xs, sm } = useDisplay();
 const chatbotClasses = ref({});
@@ -130,18 +134,26 @@ const computedMessages = computed(() => {
 });
 
 async function submitResponse() {
-  const messageObject: Message = {
+  const messageObject = {
     content: textAreaValue.value,
     role: "user",
   };
 
-  store.addMessage(messageObject);
+  store.addMessage(messageObject as Message);
   textAreaValue.value = "";
   await nextTick();
   scrollToChatEnd();
   try {
-    // const response = await axios.post("/api/AiHandler", store.messages);
-    // store.addMessage(response.data);
+    const response = await invoke({
+      topic: store.selectedRegion?.name || "common",
+      question: messageObject.content,
+      history: computedMessages.value.slice(0, -1),
+    });
+
+    store.addMessage({
+      content: response as string,
+      role: "system",
+    });
     await nextTick();
     scrollToChatEnd();
   } catch (error) {
@@ -177,7 +189,6 @@ function scrollToChatEnd() {
     height: 100%;
     top: 0;
     left: 0;
-    background: url("assets/images/logo_static.svg");
     mix-blend-mode: overlay;
     background-size: clamp(200px, 80%, 600px);
     background-position: center 30%;
