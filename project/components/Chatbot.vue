@@ -76,7 +76,15 @@
         auto-grow
         hide-details="auto"
         rounded="lg"
-      />
+      >
+        <template v-slot:append>
+          <v-icon
+            :class="sendButtonActiveClass"
+            icon="mdi-send-variant"
+            @click="submitResponse"
+          />
+        </template>
+      </v-textarea>
     </div>
   </div>
 </template>
@@ -96,7 +104,7 @@ const store = useChatbotStore();
 const textAreaValue = ref("");
 
 const handleEnter = (e: KeyboardEvent) => {
-  if (e.key == "Enter" && !e.shiftKey && textAreaValue.value.trim()) {
+  if (e.key == "Enter" && !e.shiftKey && textFieldHasText.value) {
     e.preventDefault();
     submitResponse();
   }
@@ -120,6 +128,7 @@ const computedMessages = computed(() => {
 });
 
 async function submitResponse() {
+  if (!textFieldHasText.value) return;
   const messageObject = {
     content: textAreaValue.value,
     role: "user",
@@ -158,6 +167,14 @@ const isDesktop = computed(() => mdAndUp.value);
 const chatbotClasses = computed(() => {
   return isDesktop.value ? "chatbot chatbot_desktop" : "chatbot";
 });
+
+const textFieldHasText = computed(() => {
+  return textAreaValue.value.trim().length > 0;
+});
+
+const sendButtonActiveClass = computed(() =>
+  textFieldHasText.value ? "send_button_active" : ""
+);
 </script>
 
 <style scoped lang="scss">
@@ -165,6 +182,11 @@ const chatbotClasses = computed(() => {
   position: fixed;
   width: 100%;
   height: 100%;
+}
+
+.send_button_active {
+  cursor: pointer;
+  color: blue;
 }
 
 .chatbot {
