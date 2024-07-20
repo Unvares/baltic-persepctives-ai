@@ -1,24 +1,7 @@
-import os
-import re
-from pathlib import Path
-from typing import Any, Callable, Dict, Union
-
-from fastapi import FastAPI, HTTPException, Request
-from langchain_community.chat_message_histories import FileChatMessageHistory
-from langchain_core import __version__
-from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables import ConfigurableFieldSpec, RunnablePassthrough
-from langchain_core.runnables import RunnableBranch
-from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_openai import ChatOpenAI
-from langserve import add_routes
-from starlette.middleware.cors import CORSMiddleware
-from typing_extensions import TypedDict
+from langchain_core.prompts import ChatPromptTemplate
 
 from chatbot_model import get_model
-from history_chain import chain_with_history
 
 prompt_tone = ChatPromptTemplate.from_template("""
 Is the following user prompt more passive or active?

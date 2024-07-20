@@ -1,28 +1,15 @@
-import os
-import re
-from pathlib import Path
-from typing import Any, Callable, Dict, Union
+from typing import Any, Dict
 
 from fastapi import FastAPI, HTTPException, Request
-from langchain_community.chat_message_histories import FileChatMessageHistory
-from langchain_core import __version__
-from langchain_core.chat_history import BaseChatMessageHistory
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables import ConfigurableFieldSpec
-from langchain_core.runnables import RunnableBranch
-from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_openai import ChatOpenAI
 from langserve import add_routes
 from starlette.middleware.cors import CORSMiddleware
-from typing_extensions import TypedDict
-from topic_chain import get_persona_chain
 
-from language_chain import language_chain
-from topic_chain import branch
-from tone_chain import tone_chain
-from history_chain import chain_with_history
 from chatbot_model import get_model
+from history_chain import chain_with_history
+from language_chain import language_chain
+from tone_chain import tone_chain
+from topic_chain import branch
+from topic_chain import get_persona_chain
 
 # Initialize OpenAI client
 model = get_model()

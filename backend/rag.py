@@ -1,12 +1,14 @@
-from langchain_chroma import Chroma
-from langchain_core.callbacks import CallbackManagerForRetrieverRun, AsyncCallbackManagerForRetrieverRun
-from langchain_core.retrievers import BaseRetriever, Document
-from langchain_huggingface.embeddings import HuggingFaceEndpointEmbeddings
-from langchain_community.document_loaders import WikipediaLoader
 from textwrap import wrap
 from typing import List, Any
-from chatbot_model import get_model
+
+from langchain_chroma import Chroma
+from langchain_community.document_loaders import WikipediaLoader
+from langchain_core.callbacks import CallbackManagerForRetrieverRun, AsyncCallbackManagerForRetrieverRun
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.retrievers import BaseRetriever, Document
+from langchain_huggingface.embeddings import HuggingFaceEndpointEmbeddings
+
+from chatbot_model import get_model
 
 
 def flatten(matrix):

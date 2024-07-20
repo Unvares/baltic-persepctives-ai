@@ -2,6 +2,8 @@ fastapi
 langchain-core
 langchain-openai
 langchain-community
+langchain-chroma
+langchain-huggingface
 langserve
 uvicorn
 sse_starlette
