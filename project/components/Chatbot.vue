@@ -1,39 +1,36 @@
 <template>
-  <div class="chatbot" :class="chatbotClasses">
-    <div>
-      <div class="chatbot__header">
-        <v-app-bar-nav-icon
-          variant="text"
-          @click.stop="isDrawerDisplayed = !isDrawerDisplayed"
-        ></v-app-bar-nav-icon>
+  <div :class="chatbotClasses">
+    <div class="chatbot__header">
+      <v-app-bar-nav-icon
+        class="menu_button"
+        variant="text"
+        @click.stop="isDrawerDisplayed = !isDrawerDisplayed"
+      ></v-app-bar-nav-icon>
 
-        <div
-          v-if="store.selectedRegion?.code"
-          class="chatbot__header-representant"
-        >
-          <img
-            style="width: 32px; margin-right: 0.5rem"
-            :src="`/flags/${store.selectedRegion.name.toLowerCase()}-flag.svg`"
-          />
-          <h2>
-            {{ representants[store.selectedRegion.code]?.name }}
-          </h2>
-        </div>
-
-        <div></div>
+      <div
+        v-if="store.selectedRegion?.code"
+        class="chatbot__header-representant"
+      >
+        <img
+          style="width: 32px; margin-right: 0.5rem"
+          :src="`/flags/${store.selectedRegion.name.toLowerCase()}-flag.svg`"
+        />
+        <h2>
+          {{ representants[store.selectedRegion.code]?.name }}
+        </h2>
       </div>
-      <div class="messages" ref="messagesDiv">
-        <MessageBubble
-          v-for="(message, index) in computedMessages"
-          :key="index"
-          :class="[
-            'message',
-            message.role === 'user' ? 'user-message' : 'system-message',
-          ]"
-        >
-          {{ message.content }}
-        </MessageBubble>
-      </div>
+    </div>
+    <div class="messages" ref="messagesDiv">
+      <MessageBubble
+        v-for="(message, index) in computedMessages"
+        :key="index"
+        :class="[
+          'message',
+          message.role === 'user' ? 'user-message' : 'system-message',
+        ]"
+      >
+        {{ message.content }}
+      </MessageBubble>
     </div>
     <div class="input-form">
       <v-textarea
@@ -69,7 +66,9 @@
             @click="handleClick(item)"
             style="width: 100%; justify-content: space-between"
           >
-            <div></div>
+            <img
+              :src="`/representants/${item.name.toLowerCase()}-representant.webp`"
+            />
             <div>
               {{ representants[item.code]["name"] }}
             </div>
@@ -91,13 +90,9 @@ import type { Message } from "@/types";
 import { flagsData } from "@/auxillary/flags";
 import { representants } from "@/auxillary/representants";
 
-import axios from "axios";
+import { useLangChain } from "@/composables/useLangChain";
 
-const { xs, sm } = useDisplay();
-const chatbotClasses = ref({});
-onMounted(
-  () => (chatbotClasses.value = { chatbot_mobile: xs, chatbot_tablet: sm })
-);
+const { invoke } = useLangChain();
 
 const store = useChatbotStore();
 const messages = computed(() =>
@@ -130,18 +125,26 @@ const computedMessages = computed(() => {
 });
 
 async function submitResponse() {
-  const messageObject: Message = {
+  const messageObject = {
     content: textAreaValue.value,
     role: "user",
   };
 
-  store.addMessage(messageObject);
+  store.addMessage(messageObject as Message);
   textAreaValue.value = "";
   await nextTick();
   scrollToChatEnd();
   try {
-    const response = await axios.post("/api/AiHandler", store.messages);
-    store.addMessage(response.data);
+    const response = await invoke({
+      topic: store.selectedRegion?.name || "common",
+      question: messageObject.content,
+      history: computedMessages.value.slice(0, -1),
+    });
+
+    store.addMessage({
+      content: response as string,
+      role: "system",
+    });
     await nextTick();
     scrollToChatEnd();
   } catch (error) {
@@ -154,6 +157,12 @@ function scrollToChatEnd() {
     messagesDiv.value.scrollTop = messagesDiv.value.scrollHeight;
   }
 }
+
+const { mdAndUp } = useDisplay();
+const isDesktop = computed(() => mdAndUp.value);
+const chatbotClasses = computed(() => {
+  return isDesktop.value ? "chatbot chatbot_desktop" : "chatbot";
+});
 </script>
 
 <style scoped lang="scss">
@@ -168,6 +177,11 @@ function scrollToChatEnd() {
   justify-content: space-between;
   background-color: rgba(255, 255, 255, 0.9);
   z-index: 3;
+
+  &_desktop {
+    height: 90%;
+    width: 60%;
+  }
 
   &::after {
     pointer-events: none;
@@ -186,9 +200,10 @@ function scrollToChatEnd() {
 
   &__header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     margin-bottom: 2rem;
+    min-height: 50px;
 
     &-representant {
       display: inline-flex;
@@ -200,6 +215,11 @@ function scrollToChatEnd() {
       font-size: 2rem;
       font-weight: bold;
     }
+  }
+
+  .menu_button {
+    position: absolute;
+    left: 20px;
   }
 
   &__region {
@@ -246,14 +266,6 @@ function scrollToChatEnd() {
       opacity: 1;
     }
   }
-}
-
-.chatbot_tablet {
-  width: 60%;
-}
-
-.chatbot_mobile {
-  width: 80%;
 }
 
 .messages {
