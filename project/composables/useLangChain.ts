@@ -10,7 +10,12 @@ export const useLangChain = () => {
   });
 
   const invoke = async (params: Record<string, unknown>) => {
-    const result = await remoteChain.invoke(params);
+    const result = await remoteChain.invoke(params, {
+      configurable: {
+        user_id: userId,
+        conversation_id: "1",
+      },
+    });
     return result;
   };
 
