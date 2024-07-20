@@ -3,6 +3,8 @@
     <div class="container">
       <HeroSection />
     </div>
+
+    <Drawer />
   </v-app>
 </template>
 
