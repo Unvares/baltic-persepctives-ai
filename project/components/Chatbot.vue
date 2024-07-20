@@ -1,5 +1,40 @@
 <template>
   <div :class="chatbotClasses">
+    <v-navigation-drawer
+      v-model="isDrawerDisplayed"
+      :location="isDesktop ? 'left' : 'bottom'"
+      temporary
+      :width="isDesktop ? '350' : '100%'"
+    >
+      <v-list>
+        <v-list-item two v-for="(item, i) in flagsData" :key="i">
+          <button
+            :class="[
+              'chatbot__region',
+              {
+                'chatbot__region--selected':
+                  item.code === store.selectedRegion?.code,
+              },
+            ]"
+            @click="handleClick(item)"
+            style="width: 100%; justify-content: space-between"
+          >
+            <img
+              :src="`/representants/${item.name.toLowerCase()}-representant.webp`"
+              style="border-radius: 30px"
+            />
+            <div>
+              {{ representants[item.code]["name"] }}
+            </div>
+            <img
+              style="width: 32px; margin-right: 0.5rem"
+              :src="`/flags/${item.name.toLowerCase()}-flag.svg`"
+            />
+          </button>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+
     <div class="chatbot__header">
       <v-app-bar-nav-icon
         class="menu_button"
@@ -43,41 +78,6 @@
         rounded="lg"
       />
     </div>
-
-    <v-navigation-drawer
-      v-model="isDrawerDisplayed"
-      :location="$vuetify.display.mobile ? 'bottom' : undefined"
-      temporary
-      v-bind:width="$vuetify.display.mobile ? '100%' : '350'"
-    >
-      <v-list>
-        <v-list-item two v-for="(item, i) in flagsData" :key="i">
-          <button
-            :class="[
-              'chatbot__region',
-              {
-                'chatbot__region--selected':
-                  item.code === store.selectedRegion?.code,
-              },
-            ]"
-            @click="handleClick(item)"
-            style="width: 100%; justify-content: space-between"
-          >
-            <img
-              :src="`/representants/${item.name.toLowerCase()}-representant.webp`"
-              style="border-radius: 30px"
-            />
-            <div>
-              {{ representants[item.code]["name"] }}
-            </div>
-            <img
-              style="width: 32px; margin-right: 0.5rem"
-              :src="`/flags/${item.name.toLowerCase()}-flag.svg`"
-            />
-          </button>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
   </div>
 </template>
 
@@ -93,9 +93,6 @@ import { useLangChain } from "@/composables/useLangChain";
 const { invoke } = useLangChain();
 
 const store = useChatbotStore();
-const messages = computed(() =>
-  store.messages.filter((message) => message.role !== "system")
-);
 const textAreaValue = ref("");
 
 const handleEnter = (e: KeyboardEvent) => {
@@ -164,6 +161,12 @@ const chatbotClasses = computed(() => {
 </script>
 
 <style scoped lang="scss">
+.v-navigation-drawer__scrim {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
 .chatbot {
   position: relative;
   margin: auto 0;
@@ -178,6 +181,7 @@ const chatbotClasses = computed(() => {
 
   &_desktop {
     height: 90%;
+    border-radius: 30px;
     width: 60%;
   }
 
@@ -200,6 +204,8 @@ const chatbotClasses = computed(() => {
     display: flex;
     justify-content: center;
     align-items: center;
+    border-bottom: 1px solid #e5e5ea;
+    padding-bottom: 10px;
     margin-bottom: 2rem;
     min-height: 50px;
 

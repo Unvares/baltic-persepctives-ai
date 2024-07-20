@@ -2,9 +2,9 @@
   <div class="content">
     <h1 class="title">
       <div ref="logo" class="logo" />
-      <span>Baltice Perspectives AI</span>
+      <span>Baltic Perspectives AI</span>
     </h1>
-    <h2>Your guide into What is going on in baltics!</h2>
+    <h2>Bridging Borders with AI</h2>
     <v-btn
       class="button"
       prepend-icon="mdi-message-arrow-right"
@@ -13,7 +13,7 @@
       elevation="4"
       @click="startChat"
     >
-      Start Chatbot
+      Start Chatting
     </v-btn>
   </div>
 </template>
