@@ -181,14 +181,14 @@ def _per_request_config_modifier(
 class InputChat(TypedDict):
     """Input for the chat endpoint."""
 
-    human_input: str
+    question: str
     """Human input"""
 
 
 chain_with_history = RunnableWithMessageHistory(
     full_chain,
     create_session_factory("chat_histories"),
-    input_messages_key="human_input",
+    input_messages_key="question",
     history_messages_key="history",
     history_factory_config=[
         ConfigurableFieldSpec(
