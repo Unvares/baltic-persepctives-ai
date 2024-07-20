@@ -1,35 +1,42 @@
 export const representants = {
-  DK: {
+  den: {
     name: "Emma Jensen",
+    colorCode: "#fa9216",
   },
-  EE: {
+  est: {
     name: "Robert Tamm",
+    colorCode: "#000000",
   },
-  FI: {
+  fin: {
     name: "Johanna Kinnunen",
+    colorCode: "#7779d6",
   },
-  DE: {
+  ger: {
     name: "Lena Müller",
+    colorCode: "#ff1f00",
   },
-  LV: {
+  lat: {
     name: "Jānis Bērziņš",
+    colorCode: "#872c1c",
   },
-  LT: {
+  lit: {
     name: "Gabija Petrauskaitė",
+    colorCode: "#037447",
   },
-  PL: {
+  pol: {
     name: "Kamil Nowak",
+    colorCode: "#e04646",
   },
-  RU: {
-    name: "Ivan Petrov",
-  },
-  SE: {
+  swe: {
     name: "Anna Andersson",
+    colorCode: "#2d7ef9",
   },
-  NO: {
+  nor: {
     name: "Jakob Hansen",
+    colorCode: "#d01b0b",
   },
-  IS: {
+  ice: {
     name: "Hanna Jónsdóttir",
+    colorCode: "#8b8c8e",
   },
 } as const;

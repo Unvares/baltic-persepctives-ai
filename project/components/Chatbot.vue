@@ -1,56 +1,28 @@
 <template>
   <div :class="chatbotClasses">
-    <div class="chatbot__header">
-      <v-app-bar-nav-icon
-        class="menu_button"
-        variant="text"
-        @click.stop="isDrawerDisplayed = !isDrawerDisplayed"
-      ></v-app-bar-nav-icon>
-
-      <div
-        v-if="store.selectedRegion?.code"
-        class="chatbot__header-representant"
-      >
-        <img
-          style="width: 32px; margin-right: 0.5rem"
-          :src="`/flags/${store.selectedRegion.name.toLowerCase()}-flag.svg`"
-        />
-        <h2>
-          {{ representants[store.selectedRegion.code]?.name }}
-        </h2>
-      </div>
-    </div>
-    <div class="messages" ref="messagesDiv">
-      <MessageBubble
-        v-for="(message, index) in computedMessages"
-        :key="index"
-        :role="message.role"
-      >
-        {{ message.content }}
-      </MessageBubble>
-    </div>
-    <div class="input-form">
-      <v-textarea
-        v-model="textAreaValue"
-        placeholder="Message"
-        @keydown.enter="handleEnter"
-        variant="solo"
-        flat
-        class="input-field"
-        rows="1"
-        auto-grow
-        hide-details="auto"
-        rounded="lg"
-      />
-    </div>
-
     <v-navigation-drawer
       v-model="isDrawerDisplayed"
-      :location="$vuetify.display.mobile ? 'bottom' : undefined"
+      :location="isDesktop ? 'left' : 'bottom'"
       temporary
-      v-bind:width="$vuetify.display.mobile ? '100%' : '350'"
+      :width="isDesktop ? '350' : '100%'"
     >
       <v-list>
+        <v-list-item two>
+          <button
+            :class="[
+              'chatbot__region',
+              {
+                'chatbot__region--selected': store.selectedRegion === null,
+              },
+            ]"
+            @click="handleClick(null)"
+            style="width: 100%; justify-content: space-between"
+          >
+            <div></div>
+            <div>Group chat</div>
+            <div></div>
+          </button>
+        </v-list-item>
         <v-list-item two v-for="(item, i) in flagsData" :key="i">
           <button
             :class="[
@@ -78,13 +50,68 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
+
+    <div class="chatbot__header">
+      <v-app-bar-nav-icon
+        class="menu_button"
+        variant="text"
+        @click.stop="isDrawerDisplayed = !isDrawerDisplayed"
+      ></v-app-bar-nav-icon>
+
+      <div class="chatbot__header-representant">
+        <img
+          v-show="store.selectedRegion"
+          style="width: 32px; margin-right: 0.5rem"
+          :src="`/flags/${store.selectedRegion?.name?.toLowerCase()}-flag.svg`"
+        />
+        <h2>
+          {{
+            store.selectedRegion
+              ? representants[store.selectedRegion.code]?.name
+              : "Group chat"
+          }}
+        </h2>
+      </div>
+    </div>
+    <div class="messages" ref="messagesDiv">
+      <MessageBubble
+        v-for="(message, index) in computedMessages"
+        :key="index"
+        :role="message.role"
+        :country="message.country"
+      >
+        {{ message.content }}
+      </MessageBubble>
+    </div>
+    <div class="input-form">
+      <v-textarea
+        v-model="textAreaValue"
+        placeholder="Message"
+        @keydown.enter="handleEnter"
+        variant="solo"
+        flat
+        class="input-field"
+        rows="1"
+        auto-grow
+        hide-details="auto"
+        rounded="lg"
+      >
+        <template v-slot:append>
+          <v-icon
+            :class="['send_button', sendButtonActiveClass]"
+            icon="mdi-send-variant"
+            @click="submitResponse"
+          />
+        </template>
+      </v-textarea>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useDisplay } from "vuetify";
 import { useChatbotStore } from "@/stores/chatbotStore";
-import type { Message } from "@/types";
+import type { CountryCode, Message } from "@/types";
 import { flagsData } from "@/auxillary/flags";
 import { representants } from "@/auxillary/representants";
 
@@ -93,13 +120,10 @@ import { useLangChain } from "@/composables/useLangChain";
 const { invoke } = useLangChain();
 
 const store = useChatbotStore();
-const messages = computed(() =>
-  store.messages.filter((message) => message.role !== "system")
-);
 const textAreaValue = ref("");
 
 const handleEnter = (e: KeyboardEvent) => {
-  if (e.key == "Enter" && !e.shiftKey && textAreaValue.value.trim()) {
+  if (e.key == "Enter" && !e.shiftKey && textFieldHasText.value) {
     e.preventDefault();
     submitResponse();
   }
@@ -107,7 +131,7 @@ const handleEnter = (e: KeyboardEvent) => {
 
 const messagesDiv: Ref<Element | undefined> = ref();
 
-const handleClick = (region: (typeof flagsData)[number]) => {
+const handleClick = (region: (typeof flagsData)[number] | null) => {
   isDrawerDisplayed.value = false;
   store.selectedRegion = region;
 };
@@ -123,6 +147,7 @@ const computedMessages = computed(() => {
 });
 
 async function submitResponse() {
+  if (!textFieldHasText.value) return;
   const messageObject = {
     content: textAreaValue.value,
     role: "user",
@@ -133,16 +158,30 @@ async function submitResponse() {
   await nextTick();
   scrollToChatEnd();
   try {
+    const safeDialogueDetails = store.selectedRegion?.code || "group";
+
     const response = await invoke({
-      topic: store.selectedRegion?.name || "common",
+      topic: safeDialogueDetails,
       question: messageObject.content,
       history: computedMessages.value.slice(0, -1),
     });
 
-    store.addMessage({
-      content: response as string,
-      role: "system",
-    });
+    const { country, message } = parseResponse(response as string);
+
+    if (store.selectedRegion?.code) {
+      store.addMessage({
+        content: message as string,
+        role: "assistant",
+        country: store.selectedRegion.code,
+      });
+    } else {
+      store.addMessage({
+        content: message as string,
+        role: "assistant",
+        country: (country as CountryCode | undefined) ?? "pol",
+      });
+    }
+
     await nextTick();
     scrollToChatEnd();
   } catch (error) {
@@ -161,9 +200,36 @@ const isDesktop = computed(() => mdAndUp.value);
 const chatbotClasses = computed(() => {
   return isDesktop.value ? "chatbot chatbot_desktop" : "chatbot";
 });
+
+const textFieldHasText = computed(() => {
+  return textAreaValue.value.trim().length > 0;
+});
+
+const sendButtonActiveClass = computed(() =>
+  textFieldHasText.value ? "send_button_active" : ""
+);
 </script>
 
 <style scoped lang="scss">
+.v-navigation-drawer__scrim {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+.send_button {
+  cursor: default;
+}
+
+.send_button::before {
+  font-size: 36px;
+}
+
+.send_button_active {
+  cursor: pointer;
+  color: blue;
+}
+
 .chatbot {
   position: relative;
   margin: auto 0;
@@ -178,6 +244,7 @@ const chatbotClasses = computed(() => {
 
   &_desktop {
     height: 90%;
+    border-radius: 30px;
     width: 60%;
   }
 
@@ -200,6 +267,8 @@ const chatbotClasses = computed(() => {
     display: flex;
     justify-content: center;
     align-items: center;
+    border-bottom: 1px solid #e5e5ea;
+    padding-bottom: 10px;
     margin-bottom: 2rem;
     min-height: 50px;
 
@@ -234,10 +303,8 @@ const chatbotClasses = computed(() => {
     font-family: "Avenir Light", sans-serif;
 
     & > div:first-child {
-      width: 48px;
-      height: 48px;
-      background-color: #ededed;
-      border-radius: 50%;
+      width: 32px;
+      height: 32px;
       flex-shrink: 0;
     }
 
