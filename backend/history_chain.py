@@ -1,28 +1,18 @@
-import os
 import re
 from pathlib import Path
-from typing import Any, Callable, Dict, Union
+from typing import Callable, Union
 
-from fastapi import FastAPI, HTTPException, Request
-from langchain.chains.retrieval import create_retrieval_chain
 from langchain_community.chat_message_histories import FileChatMessageHistory
 from langchain_core import __version__
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import ConfigurableFieldSpec
-from langchain_core.runnables import RunnableBranch
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_openai import ChatOpenAI
-from langserve import add_routes
-from starlette.middleware.cors import CORSMiddleware
 from typing_extensions import TypedDict
-from rag import WikipediaRetriever
-from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain_core.runnables import RunnableParallel, RunnablePassthrough
-from chatbot_model import get_model
-from topic_chain import branch
 
+from chatbot_model import get_model
+from rag import WikipediaRetriever
 
 # Define the minimum required version as (0, 1, 0)
 # Earlier versions did not allow specifying custom config fields in
