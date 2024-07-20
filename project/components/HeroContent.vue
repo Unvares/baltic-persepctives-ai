@@ -1,7 +1,6 @@
 <template>
   <div class="content">
     <h1 class="title">
-      <div ref="logo" class="logo" />
       <span>Baltic Perspectives AI</span>
     </h1>
     <h2>Bridging Borders with AI</h2>
