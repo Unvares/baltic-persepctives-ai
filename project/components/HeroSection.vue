@@ -51,7 +51,7 @@ const currentProps = computed(() =>
   flex-flow: column nowrap;
   justify-content: flex-start;
   align-items: center;
-  height: 100vh;
+  height: 100svh;
   max-height: 1080px;
   background-image: url("assets/images/forest_and_skies.svg");
   background-position: bottom center;

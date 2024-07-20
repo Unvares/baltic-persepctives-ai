@@ -66,7 +66,12 @@ const computedImageResolver = computed(() => {
   flex-flow: row nowrap;
   margin-bottom: 20px;
   position: relative;
-  max-width: 75%;
+}
+
+@media screen and (min-width: 768px) {
+  .message {
+    max-width: 75%;
+  }
 }
 
 .avatar {

@@ -244,7 +244,7 @@ const sendButtonActiveClass = computed(() =>
     }
 
     h2 {
-      font-size: 2rem;
+      font-size: 1.5rem;
       font-weight: bold;
     }
   }
@@ -252,6 +252,14 @@ const sendButtonActiveClass = computed(() =>
   .menu_button {
     position: absolute;
     left: 20px;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .chatbot__header-representant {
+    h2 {
+      font-size: 2rem;
+    }
   }
 }
 
