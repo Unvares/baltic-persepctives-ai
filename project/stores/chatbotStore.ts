@@ -21,6 +21,8 @@ export const useChatbotStore = defineStore("chatbot", () => {
   const selectedRegion = ref<flagData | null>(null);
   const addMessage = (message: Message) => {
     if (selectedRegion.value?.code) {
+      console.log(regionMessages[selectedRegion.value.code]);
+
       regionMessages[selectedRegion.value.code].push(message);
 
       return;
@@ -29,6 +31,12 @@ export const useChatbotStore = defineStore("chatbot", () => {
 
     return message;
   };
+
+  const previousGroupChatTheme = computed(() => {
+    if (selectedRegion.value) {
+      return undefined;
+    }
+  });
 
   return {
     messages,

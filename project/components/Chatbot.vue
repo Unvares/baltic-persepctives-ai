@@ -74,6 +74,7 @@ import type { CountryCode, Message } from "@/types";
 import { representants } from "@/auxillary/representants";
 
 import { useLangChain } from "@/composables/useLangChain";
+import { representantsPreprompt } from "@/auxillary/preprompt-history";
 
 const { invoke } = useLangChain();
 
@@ -99,6 +100,12 @@ const computedMessages = computed(() => {
 
 async function submitResponse() {
   if (!textFieldHasText.value || isLoading.value) return;
+
+  let shouldAwareOfHistory = false;
+  let modifiedMessage = representantsPreprompt;
+
+  modifiedMessage += ` ${textAreaValue.value}`;
+
   isLoading.value = true;
   const messageObject = {
     content: textAreaValue.value,
@@ -129,7 +136,7 @@ async function submitResponse() {
 
     const response = await invoke({
       topic: safeDialogueDetails,
-      question: messageObject.content,
+      question: modifiedMessage,
       history: computedMessages.value.slice(0, -1),
     });
 
