@@ -24,10 +24,7 @@
       <MessageBubble
         v-for="(message, index) in computedMessages"
         :key="index"
-        :class="[
-          'message',
-          message.role === 'user' ? 'user-message' : 'system-message',
-        ]"
+        :role="message.role"
       >
         {{ message.content }}
       </MessageBubble>
@@ -68,6 +65,7 @@
           >
             <img
               :src="`/representants/${item.name.toLowerCase()}-representant.webp`"
+              style="border-radius: 30px"
             />
             <div>
               {{ representants[item.code]["name"] }}
