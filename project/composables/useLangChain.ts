@@ -5,7 +5,7 @@ export const useLangChain = () => {
     url: "https://langserve-14565.llm.mylab.th-luebeck.dev/openai/",
   });
 
-  const invoke = async (params: Record<string, string>) => {
+  const invoke = async (params: Record<string, unknown>) => {
     const result = await remoteChain.invoke(params);
     return result;
   };

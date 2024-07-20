@@ -21,6 +21,7 @@ export const useChatbotStore = defineStore("chatbot", () => {
   const addMessage = (message: Message) => {
     if (selectedRegion.value?.code) {
       regionMessages[selectedRegion.value.code].push(message);
+
       return;
     }
     messages.value.push(message);

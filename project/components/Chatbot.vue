@@ -147,6 +147,7 @@ async function submitResponse() {
     const response = await invoke({
       topic: store.selectedRegion?.name || "common",
       question: messageObject.content,
+      history: computedMessages.value.slice(0, -1),
     });
 
     store.addMessage({
