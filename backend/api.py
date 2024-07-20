@@ -18,7 +18,7 @@ from starlette.middleware.cors import CORSMiddleware
 from typing_extensions import TypedDict
 
 from language_chain import language_chain
-from topic_chain import branch
+from topic_chain import branch, get_persona_chain
 from tone_chain import tone_chain
 from history_chain import chain_with_history
 from chatbot_model import get_model
@@ -28,19 +28,18 @@ model = get_model()
 
 
 def _per_request_config_modifier(
-    config: Dict[str, Any], request: Request
+        config: Dict[str, Any], request: Request
 ) -> Dict[str, Any]:
     """Update the config"""
     config = config.copy()
     configurable = config.get("configurable", {})
-
 
     if configurable['user_id'] is None:
         raise HTTPException(
             status_code=400,
             detail="No user id found. Please set a cookie named 'user_id'.",
         )
-    
+
     config['configurable'] = configurable
 
     # configurable["user_id"] = user_id
@@ -48,7 +47,8 @@ def _per_request_config_modifier(
     return config
 
 
-full_chain = {"topic": lambda x: x["topic"], "question": lambda x: x["question"], 'answer_tone': tone_chain, 'character': branch, 'language': language_chain} | chain_with_history
+full_chain = {"topic": lambda x: x["topic"], "question": lambda x: x["question"],
+              'answer_tone': tone_chain, 'character': branch,  'new_topic': lambda x: get_persona_chain(x['question'])[:3].lower(), 'language': language_chain} | chain_with_history
 
 app = FastAPI(
     title="LangChain Server",

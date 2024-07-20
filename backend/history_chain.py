@@ -100,7 +100,9 @@ final_prompt = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            """Language to answer in: {language} 
+            """
+            Add this in front of your answer without any context: %{new_topic}%
+            Language to answer in: {language} 
             Character you are: {character}
             {answer_tone}""",
         ),

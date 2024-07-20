@@ -19,7 +19,7 @@ from starlette.middleware.cors import CORSMiddleware
 from typing_extensions import TypedDict
 
 from language_chain import language_chain
-from topic_chain import branch
+from topic_chain import branch, get_persona_chain
 from tone_chain import tone_chain
 from history_chain import chain_with_history
 
@@ -30,7 +30,7 @@ model = ChatOpenAI(streaming=True, api_key=API_KEY, model="gpt-4o-mini")
 
 
 def _per_request_config_modifier(
-    config: Dict[str, Any], request: Request
+        config: Dict[str, Any], request: Request
 ) -> Dict[str, Any]:
     """Update the config"""
     config = config.copy()
@@ -49,16 +49,17 @@ def _per_request_config_modifier(
     return config
 
 
-full_chain = {"topic": lambda x: x["topic"], "question": lambda x: x["question"], 'answer_tone': tone_chain, 'character': branch, 'language': language_chain} | chain_with_history
+full_chain = {"topic": lambda x: x["topic"], "question": lambda x: x["question"],
+              'answer_tone': tone_chain, 'character': branch,  'new_topic': lambda x: get_persona_chain(x['question'])[:3].lower(), 'language': language_chain} | chain_with_history
 
 if __name__ == "__main__":
     conversation_id = str(uuid.uuid4())
     configuration = {'configurable': {'conversation_id': conversation_id, 'user_id': 'textuser'}}
-    out = full_chain.invoke({"topic": "sweden", "question": "Who are you?"}, configuration)
+    out = full_chain.invoke({"topic": "group", "question": "How many citizens do koeln have?"}, configuration)
     print(out)
 
-    out2 = full_chain.invoke({"topic": "sweden", "question": "Tell me something about studying in sweden."}, configuration)
-    print(out2)
+    # out2 = full_chain.invoke({"topic": "sweden", "question": "Tell me something about studying in sweden."}, configuration)
+    # print(out2)
 
-    out3 = full_chain.invoke({"topic": "sweden", "question": "What did I ask you before?"}, configuration)
-    print(out3)
+    # out3 = full_chain.invoke({"topic": "sweden", "question": "What did I ask you before?"}, configuration)
+    # print(out3)
