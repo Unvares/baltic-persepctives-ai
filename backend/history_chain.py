@@ -17,7 +17,9 @@ from langchain_openai import ChatOpenAI
 from langserve import add_routes
 from starlette.middleware.cors import CORSMiddleware
 from typing_extensions import TypedDict
-
+from rag import WikipediaRetriever
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough
 from chatbot_model import get_model
 from topic_chain import branch
 
@@ -104,7 +106,8 @@ final_prompt = ChatPromptTemplate.from_messages(
             Add this in front of your answer without any context: %{new_topic}%
             Language to answer in: {language} 
             Character you are: {character}
-            {answer_tone}""",
+            {answer_tone}
+            {context}""",
         ),
         MessagesPlaceholder(variable_name="history"),
         ("human", "{question}"),
@@ -113,10 +116,18 @@ final_prompt = ChatPromptTemplate.from_messages(
 
 
 model = get_model()
-final_chain = final_prompt | model | StrOutputParser()
+final_chain = {'context': lambda x: WikipediaRetriever().invoke(x['question']),
+               'character': lambda x: x['character'],
+               'answer_tone': lambda x: x['answer_tone'],
+               'history': lambda x: x['history'],
+               'language': lambda x: x['language'],
+               'question': lambda x: x['question'],
+               'new_topic': lambda x: x['new_topic'],
+               } | final_prompt | model | StrOutputParser()
 
-retriever = None
-# rag_chain = create_retrieval_chain(retriever, final_chain)
+#retriever = WikipediaRetriever()
+#rag_chain_document = create_stuff_documents_chain(model, final_chain)
+#rag_chain = create_retrieval_chain(retriever, rag_chain_document)
 
 chain_with_history = RunnableWithMessageHistory(
     final_chain,

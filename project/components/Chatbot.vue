@@ -7,6 +7,22 @@
       :width="isDesktop ? '350' : '100%'"
     >
       <v-list>
+        <v-list-item two>
+          <button
+            :class="[
+              'chatbot__region',
+              {
+                'chatbot__region--selected': store.selectedRegion === null,
+              },
+            ]"
+            @click="handleClick(null)"
+            style="width: 100%; justify-content: space-between"
+          >
+            <div></div>
+            <div>Group chat</div>
+            <div></div>
+          </button>
+        </v-list-item>
         <v-list-item two v-for="(item, i) in flagsData" :key="i">
           <button
             :class="[
@@ -42,16 +58,18 @@
         @click.stop="isDrawerDisplayed = !isDrawerDisplayed"
       ></v-app-bar-nav-icon>
 
-      <div
-        v-if="store.selectedRegion?.code"
-        class="chatbot__header-representant"
-      >
+      <div class="chatbot__header-representant">
         <img
+          v-show="store.selectedRegion"
           style="width: 32px; margin-right: 0.5rem"
-          :src="`/flags/${store.selectedRegion.name.toLowerCase()}-flag.svg`"
+          :src="`/flags/${store.selectedRegion?.name?.toLowerCase()}-flag.svg`"
         />
         <h2>
-          {{ representants[store.selectedRegion.code]?.name }}
+          {{
+            store.selectedRegion
+              ? representants[store.selectedRegion.code]?.name
+              : "Group chat"
+          }}
         </h2>
       </div>
     </div>
@@ -60,6 +78,7 @@
         v-for="(message, index) in computedMessages"
         :key="index"
         :role="message.role"
+        :country="message.country"
       >
         {{ message.content }}
       </MessageBubble>
@@ -79,7 +98,7 @@
       >
         <template v-slot:append>
           <v-icon
-            :class="sendButtonActiveClass"
+            :class="['send_button', sendButtonActiveClass]"
             icon="mdi-send-variant"
             @click="submitResponse"
           />
@@ -92,7 +111,7 @@
 <script setup lang="ts">
 import { useDisplay } from "vuetify";
 import { useChatbotStore } from "@/stores/chatbotStore";
-import type { Message } from "@/types";
+import type { CountryCode, Message } from "@/types";
 import { flagsData } from "@/auxillary/flags";
 import { representants } from "@/auxillary/representants";
 
@@ -112,7 +131,7 @@ const handleEnter = (e: KeyboardEvent) => {
 
 const messagesDiv: Ref<Element | undefined> = ref();
 
-const handleClick = (region: (typeof flagsData)[number]) => {
+const handleClick = (region: (typeof flagsData)[number] | null) => {
   isDrawerDisplayed.value = false;
   store.selectedRegion = region;
 };
@@ -139,16 +158,30 @@ async function submitResponse() {
   await nextTick();
   scrollToChatEnd();
   try {
+    const safeDialogueDetails = store.selectedRegion?.code || "group";
+
     const response = await invoke({
-      topic: store.selectedRegion?.name?.toLowerCase() || "group",
+      topic: safeDialogueDetails,
       question: messageObject.content,
       history: computedMessages.value.slice(0, -1),
     });
 
-    store.addMessage({
-      content: response as string,
-      role: "system",
-    });
+    const { country, message } = parseResponse(response as string);
+
+    if (store.selectedRegion?.code) {
+      store.addMessage({
+        content: message as string,
+        role: "assistant",
+        country: store.selectedRegion.code,
+      });
+    } else {
+      store.addMessage({
+        content: message as string,
+        role: "assistant",
+        country: (country as CountryCode | undefined) ?? "pol",
+      });
+    }
+
     await nextTick();
     scrollToChatEnd();
   } catch (error) {
@@ -182,6 +215,14 @@ const sendButtonActiveClass = computed(() =>
   position: fixed;
   width: 100%;
   height: 100%;
+}
+
+.send_button {
+  cursor: default;
+}
+
+.send_button::before {
+  font-size: 36px;
 }
 
 .send_button_active {
@@ -262,10 +303,8 @@ const sendButtonActiveClass = computed(() =>
     font-family: "Avenir Light", sans-serif;
 
     & > div:first-child {
-      width: 48px;
-      height: 48px;
-      background-color: #ededed;
-      border-radius: 50%;
+      width: 32px;
+      height: 32px;
       flex-shrink: 0;
     }
 
