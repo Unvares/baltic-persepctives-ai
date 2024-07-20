@@ -131,7 +131,7 @@ async function submitResponse() {
   scrollToChatEnd();
   try {
     const response = await invoke({
-      topic: store.selectedRegion?.name || "common",
+      topic: store.selectedRegion?.name?.toLowerCase() || "group",
       question: messageObject.content,
       history: computedMessages.value.slice(0, -1),
     });
