@@ -274,6 +274,7 @@ const chatbotClasses = computed(() => {
   overflow-y: auto;
   background: none;
   z-index: 2;
+  height: 100%;
 }
 
 .input-form {
