@@ -5,3 +5,4 @@ langchain-community
 langserve
 uvicorn
 sse_starlette
+wikipediaapi
