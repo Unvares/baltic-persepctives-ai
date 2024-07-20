@@ -1,7 +1,7 @@
 import { flagsData } from "@/auxillary/flags";
 import type { CountryCode } from "@/types";
 
-const countryCodes = flagsData.map((flag) => flag.code);
+const countryCodes = [...flagsData.map((flag) => flag.code), "non"];
 export const parseResponse = (response: string) => {
   const regex = /%(\w+)%/;
   const match = response.match(regex);
@@ -17,7 +17,7 @@ export const parseResponse = (response: string) => {
 
   if (!countryCodes.includes(country as CountryCode)) {
     return {
-      country: undefined,
+      country: "non",
       message: response.replace(regex, "").trim(),
     };
   }

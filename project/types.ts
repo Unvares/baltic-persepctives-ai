@@ -3,7 +3,7 @@ import { flagsData } from "@/auxillary/flags";
 type ChatHistory = [Message];
 
 type CountryDetails = (typeof flagsData)[number];
-type CountryCode = CountryDetails["code"];
+type CountryCode = CountryDetails["code"] | "non";
 
 type Message = {
   role: "system" | "user" | "assistant";

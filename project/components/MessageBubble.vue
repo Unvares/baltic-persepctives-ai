@@ -9,7 +9,7 @@
     <div :class="['text', textClass]">
       <p
         class="name"
-        v-if="country && props.role === 'assistant'"
+        v-if="country && country !== 'non' && props.role === 'assistant'"
         :style="{
           color: country && representants[country]?.colorCode,
         }"
@@ -52,6 +52,8 @@ const computedImageResolver = computed(() => {
       return "poland";
     case "swe":
       return "sweden";
+    case "non":
+      return "none";
     default:
       return "denmark";
   }
@@ -64,10 +66,16 @@ const computedImageResolver = computed(() => {
   flex-flow: row nowrap;
   margin-bottom: 20px;
   position: relative;
-  max-width: 75%;
+}
+
+@media screen and (min-width: 768px) {
+  .message {
+    max-width: 75%;
+  }
 }
 
 .avatar {
+  flex-shrink: 0;
   width: 60px;
 }
 

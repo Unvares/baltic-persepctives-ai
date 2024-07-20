@@ -34,8 +34,8 @@
         </template>
         <template v-else>
           <img
-            width="30px"
-            height="30px"
+            width="40px"
+            height="40px"
             src="@/assets/images/loading.svg"
             alt="Loading"
           />
@@ -120,7 +120,7 @@ async function submitResponse() {
     store.addMessage({
       content: "",
       role: "assistant",
-      country: "pol",
+      country: "non",
     });
   }
 
@@ -168,11 +168,11 @@ const textFieldHasText = computed(() => {
   return textAreaValue.value.trim().length > 0;
 });
 
-const sendButtonActiveClass = computed(() =>
-  textFieldHasText.value && !isLoading ? "send_button_active" : ""
-);
-
 const isLoading = ref(false);
+
+const sendButtonActiveClass = computed(() =>
+  textFieldHasText.value && !isLoading.value ? "send_button_active" : ""
+);
 </script>
 
 <style scoped lang="scss">
@@ -244,7 +244,7 @@ const isLoading = ref(false);
     }
 
     h2 {
-      font-size: 2rem;
+      font-size: 1.5rem;
       font-weight: bold;
     }
   }
@@ -252,6 +252,14 @@ const isLoading = ref(false);
   .menu_button {
     position: absolute;
     left: 20px;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .chatbot__header-representant {
+    h2 {
+      font-size: 2rem;
+    }
   }
 }
 

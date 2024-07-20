@@ -39,11 +39,21 @@ h6 {
 }
 
 h1 {
-  font-size: 72px;
+  font-size: 36px;
 }
 
 h2 {
-  font-size: 36px;
+  font-size: 18px;
+}
+
+@media screen and (min-width: 768px) {
+  h1 {
+    font-size: 72px;
+  }
+
+  h2 {
+    font-size: 36px;
+  }
 }
 
 a {
