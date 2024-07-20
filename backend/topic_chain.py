@@ -24,7 +24,7 @@ from personas import PERSONAS
 def get_persona_chain(question):
     model = get_model()
     persona_chain = (PromptTemplate.from_template(
-        """Given the user question below, detect the country that the content of the question has the biggest relation to.
+        """Given the user question below, detect the country that the content of the question has the biggest relation to as its english name.
                         Differentiate between the countries 'sweden', 'denmark', 'lithuania', 'iceland', 'norway', 'latvia',
                         'finland', 'poland', 'germany', 'estonia'.
 
