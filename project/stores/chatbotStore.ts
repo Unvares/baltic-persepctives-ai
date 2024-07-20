@@ -8,6 +8,7 @@ type flagCode = flagData["code"];
 
 export const useChatbotStore = defineStore("chatbot", () => {
   const messages = ref<Message[]>([]);
+  const isDrawerDisplayed = ref(false);
 
   const flagCodes = flagsData.map((flag) => flag.code);
 
@@ -34,5 +35,6 @@ export const useChatbotStore = defineStore("chatbot", () => {
     addMessage,
     selectedRegion,
     regionMessages,
+    isDrawerDisplayed,
   };
 });
