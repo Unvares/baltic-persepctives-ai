@@ -194,9 +194,15 @@ async function submitResponse() {
 
     const { country, message } = parseResponse(response as string);
 
-    store.messages[store.messages.length - 1].content = response as string;
-    store.messages[store.messages.length - 1].country =
-      (country as CountryCode | undefined) ?? "pol";
+    const targetMessages = store.selectedRegion?.code
+      ? store.regionMessages[store.selectedRegion.code]
+      : store.messages;
+
+    targetMessages[targetMessages.length - 1].content = message as string;
+    if (!store.selectedRegion?.code) {
+      targetMessages[targetMessages.length - 1].country =
+        (country as CountryCode | undefined) ?? "pol";
+    }
     await nextTick();
     scrollToChatEnd();
     isLoading.value = false;

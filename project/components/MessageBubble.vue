@@ -107,7 +107,6 @@ const computedImageResolver = computed(() => {
 
 .name {
   color: red;
-  margin-bottom: 1rem;
   font-weight: 600;
 }
 </style>
