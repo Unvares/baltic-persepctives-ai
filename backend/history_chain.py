@@ -94,6 +94,7 @@ final_prompt = ChatPromptTemplate.from_messages(
             "system",
             """
             Add this in front of your answer without any context: %{new_topic}%
+            Sum up your response and talk in a natural, non formal and conversation-like way.
             Language to answer in: {language} 
             Character you are: {character}
             {answer_tone}
