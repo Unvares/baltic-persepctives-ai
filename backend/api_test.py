@@ -49,12 +49,12 @@ def _per_request_config_modifier(
     return config
 
 
-full_chain = {"topic": lambda x: x["topic"], "question": lambda x: x["question"], 'answer_tone': tone_chain, 'character': branch, 'language': language_chain} | chain_with_history
+full_chain = {"topic": lambda x: x["topic"], "question": lambda x: x["question"], 'answer_tone': tone_chain, 'character': branch, 'language': language_chain} | {'input': lambda x: x['question']} | chain_with_history | StrOutputParser()
 
 if __name__ == "__main__":
     conversation_id = str(uuid.uuid4())
     configuration = {'configurable': {'conversation_id': conversation_id, 'user_id': 'textuser'}}
-    out = full_chain.invoke({"topic": "sweden", "question": "Who are you?"}, configuration)
+    out = full_chain.invoke({"topic": "poland", "question": "what party is polish prime minister from?"}, configuration)
     print(out)
 
     out2 = full_chain.invoke({"topic": "sweden", "question": "Tell me something about studying in sweden."}, configuration)
