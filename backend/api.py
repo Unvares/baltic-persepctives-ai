@@ -33,17 +33,18 @@ def _per_request_config_modifier(
     """Update the config"""
     config = config.copy()
     configurable = config.get("configurable", {})
-    # Look for a cookie named "user_id"
-    user_id = request.cookies.get("user_id", None)
 
-    if user_id is None:
+
+    if configurable['user_id'] is None:
         raise HTTPException(
             status_code=400,
             detail="No user id found. Please set a cookie named 'user_id'.",
         )
+    
+    config['configurable'] = configurable
 
-    configurable["user_id"] = user_id
-    config["configurable"] = configurable
+    # configurable["user_id"] = user_id
+    # config["configurable"] = configurable
     return config
 
 

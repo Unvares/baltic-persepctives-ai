@@ -40,7 +40,7 @@ if LANGCHAIN_CORE_VERSION < MIN_VERSION_LANGCHAIN_CORE:
 def _is_valid_identifier(value: str) -> bool:
     """Check if the value is a valid identifier."""
     # Use a regular expression to match the allowed characters
-    valid_characters = re.compile(r"^[a-zA-Z0-9-_]+$")
+    valid_characters = re.compile(r"^[a-zA-Z0-9_-]+$")
     return bool(valid_characters.match(value))
 
 
@@ -63,6 +63,7 @@ def create_session_factory(
 
     def get_chat_history(user_id: str, conversation_id: str) -> FileChatMessageHistory:
         """Get a chat history from a user id and conversation id."""
+
         if not _is_valid_identifier(user_id):
             raise ValueError(
                 f"User ID {user_id} is not in a valid format. "
