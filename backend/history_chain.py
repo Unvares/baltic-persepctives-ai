@@ -122,6 +122,7 @@ final_chain = {'context': lambda x: WikipediaRetriever().invoke(x['question']),
                'history': lambda x: x['history'],
                'language': lambda x: x['language'],
                'question': lambda x: x['question'],
+               'new_topic': lambda x: x['new_topic'],
                } | final_prompt | model | StrOutputParser()
 
 #retriever = WikipediaRetriever()
