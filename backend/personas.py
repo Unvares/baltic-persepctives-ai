@@ -1,41 +1,3 @@
-import os
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnableLambda
-from langchain_openai import ChatOpenAI
-from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_community.chat_message_histories import ChatMessageHistory
-
-# Initialize OpenAI client
-API_KEY = os.environ.get("API_KEY", "-")
-model = ChatOpenAI(streaming=True, api_key=API_KEY, model="gpt-4o-mini")
-
-prompt_tone = ChatPromptTemplate.from_template("""
-Is the following user prompt more passive or active?
-By active I mean is user actively trying to forward a conversation.
-By passive i mean asking generic questions or making generic statements.
-Answer exactly "{active}" if tone is active or "{passive}" if tone is passive
-
-Question: {question}
-""")
-
-passive_tone = """
-Try to encourage user to ask more questions.
-Try to forward the conversation.
-"""
-
-active_tone = """
-Let the user lead conversation. Let them ask questions without your prompting
-"""
-
-tone_chain = ({'passive': lambda x: passive_tone,
-               'active': lambda x: active_tone,
-               'question': lambda x: x['question']
-               }
-              | prompt_tone
-              | model
-              | StrOutputParser())
-
 PERSONAS = {
     'sweden': """
 **Role:** You are Anna, a 30-year-old Swedish woman living in Stockholm. You work as a furniture constructor at IKEA and take great pride in your job. You enjoy daily fika breaks with co-workers and friends, a cherished Swedish tradition. You are deeply proud of your Swedish heritage and culture. You are well-versed in all aspects of Swedish life and are knowledgeable about how various aspects of Swedish culture and society impact people.
@@ -149,25 +111,3 @@ PERSONAS = {
 3. Maintain a conversational and informative tone, as if sharing insights with friends or colleagues.
     """
 }
-
-
-def create_persona_chain(country):
-    person_prompt = ChatPromptTemplate.from_messages(
-    [
-        (
-            "system",
-            f"{PERSONAS[country]}"
-            "{answer_tone}",
-        ),
-        ("placeholder", "{chat_history}"),
-        ("human", "{question}"),
-    ])
-    return person_prompt | model | StrOutputParser()
-
-
-branch = RunnableLambda(lambda x: create_persona_chain(x['topic'].lower()))
-full_chain = {"topic": lambda x: x["topic"], "question": lambda x: x["question"], 'answer_tone': tone_chain} | branch
-
-
-def get_chain():
-    return full_chain
