@@ -7,6 +7,22 @@
       :width="isDesktop ? '350' : '100%'"
     >
       <v-list>
+        <v-list-item two>
+          <button
+            :class="[
+              'chatbot__region',
+              {
+                'chatbot__region--selected': store.selectedRegion === null,
+              },
+            ]"
+            @click="handleClick(null)"
+            style="width: 100%; justify-content: space-between"
+          >
+            <div></div>
+            <div>Group chat</div>
+            <div></div>
+          </button>
+        </v-list-item>
         <v-list-item two v-for="(item, i) in flagsData" :key="i">
           <button
             :class="[
@@ -42,16 +58,18 @@
         @click.stop="isDrawerDisplayed = !isDrawerDisplayed"
       ></v-app-bar-nav-icon>
 
-      <div
-        v-if="store.selectedRegion?.code"
-        class="chatbot__header-representant"
-      >
+      <div class="chatbot__header-representant">
         <img
+          v-show="store.selectedRegion"
           style="width: 32px; margin-right: 0.5rem"
-          :src="`/flags/${store.selectedRegion.name.toLowerCase()}-flag.svg`"
+          :src="`/flags/${store.selectedRegion?.name?.toLowerCase()}-flag.svg`"
         />
         <h2>
-          {{ representants[store.selectedRegion.code]?.name }}
+          {{
+            store.selectedRegion
+              ? representants[store.selectedRegion.code]?.name
+              : "Group chat"
+          }}
         </h2>
       </div>
     </div>
@@ -112,7 +130,7 @@ const handleEnter = (e: KeyboardEvent) => {
 
 const messagesDiv: Ref<Element | undefined> = ref();
 
-const handleClick = (region: (typeof flagsData)[number]) => {
+const handleClick = (region: (typeof flagsData)[number] | null) => {
   isDrawerDisplayed.value = false;
   store.selectedRegion = region;
 };
@@ -140,14 +158,14 @@ async function submitResponse() {
   scrollToChatEnd();
   try {
     const response = await invoke({
-      topic: store.selectedRegion?.name?.toLowerCase() || "group",
+      topic: store.selectedRegion?.code || "group",
       question: messageObject.content,
       history: computedMessages.value.slice(0, -1),
     });
 
     store.addMessage({
       content: response as string,
-      role: "system",
+      role: "assistant",
     });
     await nextTick();
     scrollToChatEnd();
@@ -270,10 +288,8 @@ const sendButtonActiveClass = computed(() =>
     font-family: "Avenir Light", sans-serif;
 
     & > div:first-child {
-      width: 48px;
-      height: 48px;
-      background-color: #ededed;
-      border-radius: 50%;
+      width: 32px;
+      height: 32px;
       flex-shrink: 0;
     }
 
