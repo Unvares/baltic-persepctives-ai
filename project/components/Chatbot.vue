@@ -79,7 +79,7 @@
       >
         <template v-slot:append>
           <v-icon
-            :class="sendButtonActiveClass"
+            :class="['send_button', sendButtonActiveClass]"
             icon="mdi-send-variant"
             @click="submitResponse"
           />
@@ -182,6 +182,14 @@ const sendButtonActiveClass = computed(() =>
   position: fixed;
   width: 100%;
   height: 100%;
+}
+
+.send_button {
+  cursor: default;
+}
+
+.send_button::before {
+  font-size: 36px;
 }
 
 .send_button_active {
