@@ -14,8 +14,8 @@ def flatten(matrix):
 
 
 def get_retriever(topic):
-    context = WikipediaLoader(query=topic, load_max_docs=2).load()
-    chunks = flatten([wrap(doc.page_content, 512) for doc in context])
+    context = WikipediaLoader(query=topic, load_max_docs=1, doc_content_chars_max=1024).load()
+    chunks = flatten([wrap(doc.page_content, 256) for doc in context])
 
     bge_m3_embeddings = HuggingFaceEndpointEmbeddings(model="https://bge-m3-embedding.llm.mylab.th-luebeck.dev")
     bge_m3 = Chroma.from_texts(chunks, bge_m3_embeddings, collection_name="bge_m3")
@@ -30,15 +30,18 @@ class WikipediaRetriever(BaseRetriever):
     def _get_relevant_documents(
             self, query: str, *, run_manager: CallbackManagerForRetrieverRun
     ) -> List[Document]:
-        llm = get_model()
-        parser = StrOutputParser()
-        article = (llm | parser).invoke(f"""
-            You are typing into wikipedia search bar to find article with the answer to the question below.
-            What is the name of the article? Give me only what you put in the search bar.
-            Question: {query}
-        """)
+        try:
+            llm = get_model()
+            parser = StrOutputParser()
+            article = (llm | parser).invoke(f"""
+                You are typing into wikipedia search bar to find article with the answer to the question below.
+                What is the name of the article? Give me only what you put in the search bar.
+                Question: {query}
+            """)
 
-        return get_retriever(article).invoke(query)
+            return get_retriever(article).invoke(query)
+        except:
+            return []
 
     async def _aget_relevant_documents(
             self,
