@@ -1,32 +1,32 @@
 export const representants = {
-  DK: {
+  den: {
     name: "Emma Jensen",
   },
-  EE: {
+  est: {
     name: "Robert Tamm",
   },
-  FI: {
+  fin: {
     name: "Johanna Kinnunen",
   },
-  DE: {
+  ger: {
     name: "Lena Müller",
   },
-  LV: {
+  lat: {
     name: "Jānis Bērziņš",
   },
-  LT: {
+  lit: {
     name: "Gabija Petrauskaitė",
   },
-  PL: {
+  pol: {
     name: "Kamil Nowak",
   },
-  SE: {
+  swe: {
     name: "Anna Andersson",
   },
-  NO: {
+  nor: {
     name: "Jakob Hansen",
   },
-  IS: {
+  ice: {
     name: "Hanna Jónsdóttir",
   },
 } as const;
