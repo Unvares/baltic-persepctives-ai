@@ -1,20 +1,20 @@
 <template>
   <div :class="['message', messageClass]">
-    <div
-      v-if="store.selectedRegion?.code && props.role === 'assistant'"
-      class="avatar"
-    >
+    <div v-if="props.role === 'assistant'" class="avatar">
       <img
         class="avatar_image"
-        :src="`/representants/${store.selectedRegion.name.toLowerCase()}-representant.webp`"
+        :src="`/representants/${computedImageResolver}-representant.webp`"
       />
     </div>
     <div :class="['text', textClass]">
       <p
         class="name"
-        v-if="store.selectedRegion?.code && props.role === 'assistant'"
+        v-if="country && props.role === 'assistant'"
+        :style="{
+          color: country && representants[country]?.colorCode,
+        }"
       >
-        {{ representants[store.selectedRegion.code]?.name }}
+        {{ representants[country]?.name }}
       </p>
       <slot> </slot>
     </div>
@@ -23,14 +23,39 @@
 
 <script setup lang="ts">
 import { representants } from "@/auxillary/representants";
-const store = useChatbotStore();
-const props = defineProps<{ role: string }>();
+import type { CountryCode } from "@/types";
+const props = defineProps<{ role: string; country?: CountryCode }>();
 const messageClass = computed(() =>
   props.role === "user" ? "user-message" : "system-message"
 );
 const textClass = computed(() =>
   props.role === "user" ? "user-text" : "system-text"
 );
+
+const computedImageResolver = computed(() => {
+  switch (props.country) {
+    case "den":
+      return "denmark";
+    case "est":
+      return "estonia";
+    case "fin":
+      return "finland";
+    case "ger":
+      return "germany";
+    case "lat":
+      return "latvia";
+    case "lit":
+      return "lithuania";
+    case "nor":
+      return "norway";
+    case "pol":
+      return "poland";
+    case "swe":
+      return "sweden";
+    default:
+      return "denmark";
+  }
+});
 </script>
 
 <style scoped lang="scss">
@@ -82,6 +107,7 @@ const textClass = computed(() =>
 
 .name {
   color: red;
-  font-size: 0.75rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
 }
 </style>

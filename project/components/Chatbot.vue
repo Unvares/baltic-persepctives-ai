@@ -78,6 +78,7 @@
         v-for="(message, index) in computedMessages"
         :key="index"
         :role="message.role"
+        :country="message.country"
       >
         {{ message.content }}
       </MessageBubble>
@@ -102,7 +103,7 @@
 <script setup lang="ts">
 import { useDisplay } from "vuetify";
 import { useChatbotStore } from "@/stores/chatbotStore";
-import type { Message } from "@/types";
+import type { CountryCode, Message } from "@/types";
 import { flagsData } from "@/auxillary/flags";
 import { representants } from "@/auxillary/representants";
 
@@ -148,16 +149,30 @@ async function submitResponse() {
   await nextTick();
   scrollToChatEnd();
   try {
+    const safeDialogueDetails = store.selectedRegion?.code || "group";
+
     const response = await invoke({
-      topic: store.selectedRegion?.code || "group",
+      topic: safeDialogueDetails,
       question: messageObject.content,
       history: computedMessages.value.slice(0, -1),
     });
 
-    store.addMessage({
-      content: response as string,
-      role: "assistant",
-    });
+    const { country, message } = parseResponse(response as string);
+
+    if (store.selectedRegion?.code) {
+      store.addMessage({
+        content: message as string,
+        role: "assistant",
+        country: store.selectedRegion.code,
+      });
+    } else {
+      store.addMessage({
+        content: message as string,
+        role: "assistant",
+        country: (country as CountryCode | undefined) ?? "pol",
+      });
+    }
+
     await nextTick();
     scrollToChatEnd();
   } catch (error) {
