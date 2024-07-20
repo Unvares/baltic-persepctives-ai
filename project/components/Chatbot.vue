@@ -69,7 +69,9 @@
             @click="handleClick(item)"
             style="width: 100%; justify-content: space-between"
           >
-            <div></div>
+            <img
+              :src="`/representants/${item.name.toLowerCase()}-representant.webp`"
+            />
             <div>
               {{ representants[item.code]["name"] }}
             </div>
